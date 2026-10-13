@@ -1,0 +1,4 @@
+source_month,raw_records,observed_trip_records,outside_or_missing_pickup,duration_cohort,fare_cohort,total_charge_cohort,unmapped_pickup_records,unmapped_dropoff_records,median_duration_minutes,median_fare_usd
+2025-01,3475226,3475205,21,3471777,3331087,3412168,0,0,11.7,12.8
+2025-02,3577543,3577543,0,3571078,3394888,3522364,0,0,12.216666666666667,13.5
+2025-03,4145257,4145253,4,4121399,3936529,4076567,0,0,12.516666666666667,14.1

@@ -1,0 +1,317 @@
+{
+  "observed_at_utc": "2026-10-13T21:41:42.975946+00:00",
+  "duckdb_version": "1.5.6",
+  "sources": [
+    {
+      "file": "yellow_tripdata_2025-01.parquet",
+      "bytes": 59158238,
+      "sha256": "9af277e4c0d3f9deb30644da822981e1e7df6af58313170fd3aa8a474485488a",
+      "month": "2025-01",
+      "url": "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-01.parquet",
+      "schema": [
+        {
+          "column": "VendorID",
+          "type": "INTEGER"
+        },
+        {
+          "column": "tpep_pickup_datetime",
+          "type": "TIMESTAMP"
+        },
+        {
+          "column": "tpep_dropoff_datetime",
+          "type": "TIMESTAMP"
+        },
+        {
+          "column": "passenger_count",
+          "type": "BIGINT"
+        },
+        {
+          "column": "trip_distance",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "RatecodeID",
+          "type": "BIGINT"
+        },
+        {
+          "column": "store_and_fwd_flag",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "PULocationID",
+          "type": "INTEGER"
+        },
+        {
+          "column": "DOLocationID",
+          "type": "INTEGER"
+        },
+        {
+          "column": "payment_type",
+          "type": "BIGINT"
+        },
+        {
+          "column": "fare_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "extra",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "mta_tax",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "tip_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "tolls_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "improvement_surcharge",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "total_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "congestion_surcharge",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "Airport_fee",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "cbd_congestion_fee",
+          "type": "DOUBLE"
+        }
+      ],
+      "profile": {
+        "rows": 3475226,
+        "earliest_pickup": "2024-12-31 20:47:55",
+        "latest_pickup": "2025-02-01 00:00:44",
+        "missing_pickup": 0,
+        "outside_quarter": 21,
+        "nonpositive_duration": 2051,
+        "negative_fare": 144118,
+        "negative_total": 63037,
+        "nonpositive_distance": 90893
+      }
+    },
+    {
+      "file": "yellow_tripdata_2025-02.parquet",
+      "bytes": 60343086,
+      "sha256": "037cba555a73663f3a51a2c27816e40e3feb364769942bdf122b9da31e377bd3",
+      "month": "2025-02",
+      "url": "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-02.parquet",
+      "schema": [
+        {
+          "column": "VendorID",
+          "type": "INTEGER"
+        },
+        {
+          "column": "tpep_pickup_datetime",
+          "type": "TIMESTAMP"
+        },
+        {
+          "column": "tpep_dropoff_datetime",
+          "type": "TIMESTAMP"
+        },
+        {
+          "column": "passenger_count",
+          "type": "BIGINT"
+        },
+        {
+          "column": "trip_distance",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "RatecodeID",
+          "type": "BIGINT"
+        },
+        {
+          "column": "store_and_fwd_flag",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "PULocationID",
+          "type": "INTEGER"
+        },
+        {
+          "column": "DOLocationID",
+          "type": "INTEGER"
+        },
+        {
+          "column": "payment_type",
+          "type": "BIGINT"
+        },
+        {
+          "column": "fare_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "extra",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "mta_tax",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "tip_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "tolls_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "improvement_surcharge",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "total_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "congestion_surcharge",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "Airport_fee",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "cbd_congestion_fee",
+          "type": "DOUBLE"
+        }
+      ],
+      "profile": {
+        "rows": 3577543,
+        "earliest_pickup": "2025-01-31 22:22:53",
+        "latest_pickup": "2025-03-01 00:06:32",
+        "missing_pickup": 0,
+        "outside_quarter": 0,
+        "nonpositive_duration": 5164,
+        "negative_fare": 182655,
+        "negative_total": 55179,
+        "nonpositive_distance": 99771
+      }
+    },
+    {
+      "file": "yellow_tripdata_2025-03.parquet",
+      "bytes": 69964745,
+      "sha256": "20c4b77cce457b7cfdae77c5069ca7dc91c167f876a41467f4502ab69487a186",
+      "month": "2025-03",
+      "url": "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-03.parquet",
+      "schema": [
+        {
+          "column": "VendorID",
+          "type": "INTEGER"
+        },
+        {
+          "column": "tpep_pickup_datetime",
+          "type": "TIMESTAMP"
+        },
+        {
+          "column": "tpep_dropoff_datetime",
+          "type": "TIMESTAMP"
+        },
+        {
+          "column": "passenger_count",
+          "type": "BIGINT"
+        },
+        {
+          "column": "trip_distance",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "RatecodeID",
+          "type": "BIGINT"
+        },
+        {
+          "column": "store_and_fwd_flag",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "PULocationID",
+          "type": "INTEGER"
+        },
+        {
+          "column": "DOLocationID",
+          "type": "INTEGER"
+        },
+        {
+          "column": "payment_type",
+          "type": "BIGINT"
+        },
+        {
+          "column": "fare_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "extra",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "mta_tax",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "tip_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "tolls_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "improvement_surcharge",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "total_amount",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "congestion_surcharge",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "Airport_fee",
+          "type": "DOUBLE"
+        },
+        {
+          "column": "cbd_congestion_fee",
+          "type": "DOUBLE"
+        }
+      ],
+      "profile": {
+        "rows": 4145257,
+        "earliest_pickup": "2007-12-05 18:45:00",
+        "latest_pickup": "2025-04-01 00:00:17",
+        "missing_pickup": 0,
+        "outside_quarter": 4,
+        "nonpositive_duration": 22280,
+        "negative_fare": 208724,
+        "negative_total": 68686,
+        "nonpositive_distance": 103722
+      }
+    },
+    {
+      "file": "taxi_zone_lookup.csv",
+      "bytes": 12331,
+      "sha256": "1a99e105092230f8620f301edcca7f80d3080642ff404d28ed957d3fa222c8ed",
+      "url": "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv",
+      "profile": {
+        "rows": 265,
+        "distinct_zone_ids": 265,
+        "missing_zone_ids": 0
+      }
+    }
+  ]
+}
