@@ -1,0 +1,4 @@
+duckdb>=1.0,<2
+dbt-core>=1.9,<2
+dbt-duckdb>=1.9,<2
+pytest>=8,<10
