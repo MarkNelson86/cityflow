@@ -1,0 +1,8 @@
+cityflow:
+  target: demo
+  outputs:
+    demo:
+      type: duckdb
+      path: data/warehouse/cityflow_demo.duckdb
+      schema: analytics
+      threads: 2

@@ -1,0 +1,6 @@
+{
+  "dataset": "cityflow_synthetic",
+  "months": ["2025-01", "2025-02", "2025-03"],
+  "trip_url_template": "fixture://cityflow/yellow_tripdata_{month}.parquet",
+  "zones_url": "fixture://cityflow/taxi_zone_lookup.csv"
+}
