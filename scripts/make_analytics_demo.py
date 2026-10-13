@@ -1,0 +1,32 @@
+"""Create the phase-3 synthetic inputs without changing the earlier fixture."""
+import argparse
+import shutil
+from pathlib import Path
+
+import duckdb
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', type=Path, default=ROOT / 'data/analytics_demo_raw')
+    args = parser.parse_args()
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    with duckdb.connect() as con:
+        con.execute('CREATE TABLE fixture AS SELECT * FROM read_csv_auto(?)',
+                    [str(ROOT / 'tests/fixtures/analytics_trips.csv')])
+        for month in ('2025-01', '2025-02', '2025-03'):
+            con.execute('''
+                CREATE OR REPLACE TEMP TABLE chosen AS
+                SELECT * EXCLUDE (source_month) FROM fixture WHERE source_month = ?
+            ''', [month])
+            path = args.output_dir / f'yellow_tripdata_{month}.parquet'
+            con.execute('COPY chosen TO ? (FORMAT PARQUET)', [str(path)])
+            print(path)
+    shutil.copyfile(ROOT / 'tests/fixtures/zones.csv',
+                    args.output_dir / 'taxi_zone_lookup.csv')
+
+
+if __name__ == '__main__':
+    main()

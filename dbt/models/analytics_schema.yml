@@ -1,0 +1,27 @@
+version: 2
+models:
+  - name: mart_daily_activity
+    description: Complete daily calendar with metric-specific denominators; counts are null when the snapshot is incomplete.
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+      - name: trip_count
+        data_tests: [not_null]
+      - name: snapshot_complete
+        data_tests: [not_null]
+  - name: mart_route_monthly
+    description: Complete ordered-route by pickup-month grid; low-sample metrics are flagged.
+    columns:
+      - name: route_month_key
+        data_tests: [unique, not_null]
+      - name: trip_count
+        data_tests: [not_null]
+      - name: snapshot_complete
+        data_tests: [not_null]
+  - name: mart_route_month_comparison
+    description: Adjacent calendar-month comparisons with guarded percentage denominators and metric sample thresholds.
+    columns:
+      - name: route_month_key
+        data_tests: [unique, not_null]
+      - name: snapshot_complete
+        data_tests: [not_null]

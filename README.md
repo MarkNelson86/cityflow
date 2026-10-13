@@ -4,8 +4,8 @@ A SQL analytics warehouse for recorded NYC yellow-taxi trips, built with
 Python, DuckDB and dbt Core.
 
 ## Status
-Transactional ingestion and first dbt models are implemented and validated
-on the frozen three-month source snapshot. Analytical queries are next.
+Transactional ingestion, warehouse models and analytical SQL are implemented
+and validated on the frozen January–March 2025 snapshot.
 
 ## Planned analyses
 - Trip activity by date, hour, pickup zone and destination zone.
@@ -40,3 +40,19 @@ Source audit -> manifest-backed ingestion -> dbt models -> quality tests
 
 ## Warehouse design
 See [warehouse design](docs/warehouse_design.md), [source audit](docs/source_audit_2025q1.json), and [quality summary](docs/quality_summary_2025q1.csv).
+
+## Analytical SQL
+
+- Complete daily activity calendar with metric-specific cohorts.
+- Ordered route/month distributions, calendar-day rates and volume ranks.
+- Adjacent-month comparisons with explicit sample thresholds and zero-denominator handling.
+
+See [analytical definitions](docs/analytics_design.md) and
+[recorded snapshot results](docs/results/overview.md).
+
+To rebuild the analytical outputs after the warehouse is available:
+
+```bash
+dbt build --project-dir dbt --profiles-dir dbt --select tag:analytics
+python scripts/export_analytics.py
+```
