@@ -1,0 +1,154 @@
+┌─────────────────────────────────────┐
+│┌───────────────────────────────────┐│
+││    Query Profiling Information    ││
+│└───────────────────────────────────┘│
+└─────────────────────────────────────┘
+EXPLAIN ANALYZE -- Question: how many recorded geographic trips used each directed route/month? -- Input grain: one source record in fact_trips. Output grain: route × pickup month. -- Keep exactly the same geographic and observed-record rules as the saved mart. with observed_geographic as (     select         cast(date_trunc('month', pickup_date) as date) as month_start,         pickup_zone_id::varchar || '->' || dropoff_zone_id::varchar as route_key     from analytics.fact_trips     where is_observed_trip       and pickup_zone_found and dropoff_zone_found       and pickup_borough in ('Bronx', 'Brooklyn', 'Manhattan', 'Queens', 'Staten Island')       and dropoff_borough in ('Bronx', 'Brooklyn', 'Manhattan', 'Queens', 'Staten Island') ) select month_start, route_key, count(*) as trip_count from observed_geographic group by month_start, route_key order by month_start, route_key 
+┌────────────────────────────────────────────────┐
+│┌──────────────────────────────────────────────┐│
+││              Total Time: 0.782s              ││
+│└──────────────────────────────────────────────┘│
+└────────────────────────────────────────────────┘
+┌───────────────────────────┐
+│           QUERY           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│      EXPLAIN_ANALYZE      │
+│    ────────────────────   │
+│                           │
+│           0 rows          │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│          ORDER_BY         │
+│    ────────────────────   │
+│    observed_geographic    │
+│      .month_start ASC     │
+│    observed_geographic    │
+│       .route_key ASC      │
+│                           │
+│                           │
+│                           │
+│        103,709 rows       │
+│           0.01s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│       HASH_GROUP_BY       │
+│    ────────────────────   │
+│          Groups:          │
+│             #0            │
+│             #1            │
+│                           │
+│        Aggregates:        │
+│        count_star()       │
+│                           │
+│                           │
+│                           │
+│        103,709 rows       │
+│           0.33s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│        month_start        │
+│         route_key         │
+│                           │
+│                           │
+│                           │
+│      11,095,265 rows      │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│        month_start        │
+│         route_key         │
+│                           │
+│                           │
+│                           │
+│      11,095,265 rows      │
+│           0.79s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│             #0            │
+│             #1            │
+│             #2            │
+│                           │
+│                           │
+│                           │
+│      11,095,265 rows      │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│           FILTER          │
+│    ────────────────────   │
+│  (IN (...) AND IN (...))  │
+│                           │
+│                           │
+│                           │
+│      11,095,265 rows      │
+│           0.03s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         HASH_JOIN         │
+│    ────────────────────   │
+│      Join Type: MARK      │
+│                           │
+│        Conditions:        │
+│    dropoff_borough = #0   ├───────────────────────────────────────────┐
+│                           │                                           │
+│                           │                                           │
+│                           │                                           │
+│      11,198,001 rows      │                                           │
+│           0.10s           │                                           │
+└─────────────┬─────────────┘                                           │
+┌─────────────┴─────────────┐                             ┌─────────────┴─────────────┐
+│         HASH_JOIN         │                             │      COLUMN_DATA_SCAN     │
+│    ────────────────────   │                             │                           │
+│      Join Type: MARK      │                             │                           │
+│                           │                             │           0.00s           │
+│        Conditions:        │                             │                           │
+│    pickup_borough = #0    ├──────────────┐              │                           │
+│                           │              │              │                           │
+│                           │              │              │                           │
+│                           │              │              │                           │
+│      11,198,001 rows      │              │              │           5 rows          │
+│           0.11s           │              │              │          (0.00s)          │
+└─────────────┬─────────────┘              │              └───────────────────────────┘
+┌─────────────┴─────────────┐┌─────────────┴─────────────┐
+│         TABLE_SCAN        ││      COLUMN_DATA_SCAN     │
+│    ────────────────────   ││                           │
+│           Table:          ││                           │
+│     cityflow.analytics    ││           0.00s           │
+│        .fact_trips        ││                           │
+│                           ││                           │
+│   Type: Sequential Scan   ││                           │
+│                           ││                           │
+│        Projections:       ││                           │
+│       pickup_borough      ││                           │
+│      dropoff_borough      ││                           │
+│        pickup_date        ││                           │
+│       pickup_zone_id      ││                           │
+│      dropoff_zone_id      ││                           │
+│                           ││                           │
+│          Filters:         ││                           │
+│      is_observed_trip     ││                           │
+│     pickup_zone_found     ││                           │
+│     dropoff_zone_found    ││                           │
+│  optional: pickup_borough ││                           │
+│  IN ('Bronx', 'Brooklyn', ││                           │
+│  'Manhattan', 'Queens',   ││                           │
+│      'Staten Island')     ││                           │
+│ optional: dropoff_borough ││                           │
+│  IN ('Bronx', 'Brooklyn', ││                           │
+│  'Manhattan', 'Queens',   ││                           │
+│      'Staten Island')     ││                           │
+│                           ││                           │
+│                           ││                           │
+│                           ││                           │
+│      11,198,001 rows      ││           5 rows          │
+│           0.12s           ││          (0.00s)          │
+└───────────────────────────┘└───────────────────────────┘
+

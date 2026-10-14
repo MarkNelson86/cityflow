@@ -1,0 +1,16 @@
+query,repeat,seconds,returned_rows
+route_counts_from_fact,1,0.8692168710003898,103709
+route_counts_from_mart,1,0.07899695099968085,103709
+top_route_comparison,1,0.018588202000501042,3
+route_counts_from_mart,2,0.0707014519994118,103709
+top_route_comparison,2,0.02009152700065897,3
+route_counts_from_fact,2,0.842345172000023,103709
+top_route_comparison,3,0.018028857999524917,3
+route_counts_from_fact,3,0.8586235129996567,103709
+route_counts_from_mart,3,0.07766097799958516,103709
+route_counts_from_fact,4,0.8671366529997613,103709
+route_counts_from_mart,4,0.07750425899939728,103709
+top_route_comparison,4,0.023484895000365213,3
+route_counts_from_mart,5,0.08189499100080866,103709
+top_route_comparison,5,0.02290927699959866,3
+route_counts_from_fact,5,0.9786007939992487,103709

@@ -1,0 +1,101 @@
+┌─────────────────────────────────────┐
+│┌───────────────────────────────────┐│
+││    Query Profiling Information    ││
+│└───────────────────────────────────┘│
+└─────────────────────────────────────┘
+EXPLAIN ANALYZE -- Same question and output grain as route_counts_from_fact.sql. -- Aggregation has already happened during the dbt build: filter the saved rows. -- Zero months and non-geographic routes are retained in the mart but excluded here. select month_start, route_key, trip_count from analytics.mart_route_monthly where snapshot_complete and is_geographic_route and trip_count > 0 order by month_start, route_key 
+┌────────────────────────────────────────────────┐
+│┌──────────────────────────────────────────────┐│
+││              Total Time: 0.0239s             ││
+│└──────────────────────────────────────────────┘│
+└────────────────────────────────────────────────┘
+┌───────────────────────────┐
+│           QUERY           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│      EXPLAIN_ANALYZE      │
+│    ────────────────────   │
+│                           │
+│           0 rows          │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│             #0            │
+│__internal_decompress_strin│
+│           g(#1)           │
+│__internal_decompress_integ│
+│     ral_bigint(#2, 0)     │
+│                           │
+│                           │
+│                           │
+│        103,709 rows       │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│          ORDER_BY         │
+│    ────────────────────   │
+│     cityflow.analytics    │
+│    .mart_route_monthly    │
+│      .month_start ASC     │
+│     cityflow.analytics    │
+│    .mart_route_monthly    │
+│       .route_key ASC      │
+│                           │
+│                           │
+│                           │
+│        103,709 rows       │
+│           0.01s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│             #0            │
+│__internal_compress_string_│
+│        uhugeint(#1)       │
+│__internal_compress_integra│
+│     l_usmallint(#2, 0)    │
+│                           │
+│                           │
+│                           │
+│        103,709 rows       │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│        month_start        │
+│         route_key         │
+│         trip_count        │
+│                           │
+│                           │
+│                           │
+│        103,709 rows       │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         TABLE_SCAN        │
+│    ────────────────────   │
+│           Table:          │
+│     cityflow.analytics    │
+│    .mart_route_monthly    │
+│                           │
+│   Type: Sequential Scan   │
+│                           │
+│        Projections:       │
+│         trip_count        │
+│        month_start        │
+│         route_key         │
+│                           │
+│          Filters:         │
+│     snapshot_complete     │
+│    is_geographic_route    │
+│        trip_count>0       │
+│                           │
+│                           │
+│                           │
+│        103,709 rows       │
+│           0.00s           │
+└───────────────────────────┘
+

@@ -56,3 +56,26 @@ To rebuild the analytical outputs after the warehouse is available:
 dbt build --project-dir dbt --profiles-dir dbt --select tag:analytics
 python scripts/export_analytics.py
 ```
+
+## Performance and CI
+
+The [measurement and CI contract](docs/performance_and_ci.md) defines equivalent
+query comparisons, source/version checks and the synthetic regression pipeline.
+See [benchmark evidence and the materialization decision](docs/performance/decision.md).
+
+Run the same synthetic checks locally as on GitHub:
+
+```bash
+python scripts/run_ci_checks.py
+```
+
+After the real warehouse is built and tested, measure saved-mart reads against
+equivalent fact aggregations:
+
+```bash
+python scripts/benchmark_queries.py --output-dir reports/performance/new_run
+```
+
+The [GitHub workflow](.github/workflows/ci.yml) runs on PRs and main with Python 3.11.
+CI uses committed/generated fixtures; real snapshot checks remain a local checkpoint.
+Benchmark timings are measurements, not machine-dependent CI pass/fail thresholds.
