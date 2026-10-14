@@ -1,0 +1,20 @@
+{
+  "tests/analytics_comparison_predecessor.sql": "458cb49d15a26cf037dd5e3c11f4c18e95898ca5a7dcce10d43358a089cdb7dc",
+  "tests/reconcile_trip_rows.sql": "59f7763f910b0cedc2a83d1430a2975132fbaf2d078ec875eaa1514c3ee13fc0",
+  "tests/analytics_daily_reconciliation.sql": "10e624772ebce50afdd07c89cd8bef0a79927731bdba9ef9980889b35da2d1a0",
+  "tests/expected_source_coverage.sql": "519dca12f0ea5488da8b07f6aa26457f5cea89db118b8d697db76c0bbcaee4cc",
+  "tests/analytics_route_reconciliation.sql": "f326b14c2bafe1c7755d4232ed6002d5db77e9d59cf11d77f70576a3f84a4509",
+  "tests/analytics_route_grid.sql": "232e2913c5e93f4154f4aea44b94bfc0b110ab4d700d86d5eca33d7f5ff4f3d8",
+  "tests/analytics_metric_invariants.sql": "fbd235cf50705d012052394b69adce1daba986777f14c1ada1e3d0d3f4ce3f83",
+  "tests/analytics_fact_source_versions.sql": "4f59e978c66401be29c2a51128f3e8ba58182ce62f6f2137af7be48be92b6155",
+  "tests/calendar_coverage.sql": "e7c5baadc9de68fc950fe9c0697451374e4d833be845f59186c0f918767d32c9",
+  "models/staging/stg_trips.sql": "d283c4fb41b6a7c71d89753d9fe6d7dca3a61f31dbf60a62cbb95d55d3170fbd",
+  "models/staging/stg_zones.sql": "ff03621cf8fc31618acfa3fe8f175ef91f91d6941c3790b9cd4ca07041a60267",
+  "models/marts/fact_trips.sql": "90b43c00597517da8147db642ff087ff0534b3fd3a06e97d71769c73d618cd00",
+  "models/marts/mart_route_month_comparison.sql": "4690ebfd7cf919bfb61712357689ce5c2fe865817446d425cc4cec9fbf083cb1",
+  "models/marts/mart_route_monthly.sql": "1abc36adc2308777a656674c69f1a7d1a783ad6dc9f78084201d471468633d1d",
+  "models/marts/dim_dates.sql": "32792c8d6d52f2b12b404a0750b53701817ffd1218476dcd346defd9719f8d59",
+  "models/marts/mart_daily_activity.sql": "139097e97a235142317a3b2834b4367b4cf3b525c0bfe8a4aa8c97e8726ff115",
+  "models/marts/dim_zones.sql": "89e163560dfd74d3e2fe449e22b4654d2c09e993c9bb37ecebbe74a7206266b5",
+  "macros/cityflow_snapshot_complete.sql": "b63b93c8e42bf40d2a78ade559b4a6592aa7ab3f887f609a4245de31f08c8044"
+}

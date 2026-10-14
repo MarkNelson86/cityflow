@@ -1,0 +1,18 @@
+cityflow:
+  target: cloud
+  outputs:
+    cloud:
+      type: snowflake
+      account: "{{ env_var('CITYFLOW_SF_ACCOUNT') }}"
+      user: "{{ env_var('CITYFLOW_SF_USER') }}"
+      authenticator: externalbrowser
+      role: CITYFLOW_ROLE
+      database: "{{ env_var('CITYFLOW_SF_DATABASE') }}"
+      warehouse: CITYFLOW_WH
+      schema: ANALYTICS
+      threads: 2
+      query_tag: cityflow_snowflake
+      session_parameters:
+        TIMEZONE: UTC
+        DATE_OUTPUT_FORMAT: YYYY-MM-DD
+        STATEMENT_TIMEOUT_IN_SECONDS: 600

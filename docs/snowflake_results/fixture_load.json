@@ -1,0 +1,26 @@
+{
+  "dataset": "fixture",
+  "tables": [
+    {
+      "table": "RAW.TRIPS",
+      "rows": 13,
+      "export_sha256": "b4d6738cf1460d4c183d983372b107f39da4b011b04ca63be84f2b7e6db42438"
+    },
+    {
+      "table": "RAW.ZONES",
+      "rows": 2,
+      "export_sha256": "79df6258db90e12984594bc53ad21752e2687b7786e7940f82dabad01eb24ecd"
+    },
+    {
+      "table": "META.LOADED_SOURCES",
+      "rows": 4,
+      "export_sha256": "48bbf9804c660cf6905f025c00091aa930bd76d7c4d2d778dd2d3132e4c77ebf"
+    }
+  ],
+  "query_ids": [
+    "01c7b821-0308-fa77-0000-0011d6c2632d",
+    "01c7b821-0308-fa77-0000-0011d6c26335",
+    "01c7b821-0308-fabc-0000-0011d6c2ba6d"
+  ],
+  "trip_partitions_verified": true
+}

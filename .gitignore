@@ -16,3 +16,9 @@ dbt/target/
 dbt/logs/
 dbt/dbt_packages/
 logs/
+
+# Snowflake development environment and generated execution artifacts
+.venv-snowflake/
+dbt_snowflake/target/
+dbt_snowflake/logs/
+dbt_snowflake/dbt_packages/

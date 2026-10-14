@@ -1,0 +1,12 @@
+name: cityflow
+version: '0.1.0'
+config-version: 2
+profile: cityflow
+model-paths: [models]
+clean-targets: [target, dbt_packages]
+models:
+  cityflow:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

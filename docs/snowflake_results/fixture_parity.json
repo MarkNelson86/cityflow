@@ -1,0 +1,29 @@
+{
+  "dataset": "fixture",
+  "all_equal": true,
+  "float_absolute_tolerance": 1e-09,
+  "float_relative_tolerance": 1e-12,
+  "models": [
+    {
+      "model": "mart_daily_activity",
+      "local_rows": 90,
+      "cloud_rows": 90,
+      "query_id": "01c7b823-0308-fa77-0000-0011d6c263a5",
+      "mismatch_examples": []
+    },
+    {
+      "model": "mart_route_monthly",
+      "local_rows": 12,
+      "cloud_rows": 12,
+      "query_id": "01c7b823-0308-fabc-0000-0011d6c2bb09",
+      "mismatch_examples": []
+    },
+    {
+      "model": "mart_route_month_comparison",
+      "local_rows": 12,
+      "cloud_rows": 12,
+      "query_id": "01c7b823-0308-fabc-0000-0011d6c2bb0d",
+      "mismatch_examples": []
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+version: 2
+models:
+  - name: stg_trips
+    description: Renamed trip fields, durations and separate metric eligibility flags.
+  - name: stg_zones
+    description: Renamed zone reference fields.
+  - name: dim_zones
+    description: One row per zone, used for both pickup and dropoff joins.
+    columns:
+      - name: zone_id
+        data_tests: [unique, not_null]
+  - name: dim_dates
+    description: Complete 90-day calendar for the first quarter of 2025.
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+  - name: fact_trips
+    description: Every preserved trip record enriched with quality flags and zone names.
+    columns:
+      - name: trip_id
+        data_tests: [unique, not_null]
+      - name: source_month
+        data_tests: [not_null]
+      - name: source_sha256
+        data_tests: [not_null]
+      - name: is_observed_trip
+        data_tests: [not_null]
+      - name: is_duration_eligible
+        data_tests: [not_null]
+      - name: is_fare_eligible
+        data_tests: [not_null]
+      - name: is_total_eligible
+        data_tests: [not_null]
+      - name: is_distance_eligible
+        data_tests: [not_null]

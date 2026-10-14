@@ -1,0 +1,26 @@
+{
+  "dataset": "real",
+  "tables": [
+    {
+      "table": "RAW.TRIPS",
+      "rows": 11198026,
+      "export_sha256": "9d609a96e6d72d0709d2281eb4d82c4cd75f89cead8e4315adf57006841f4dbe"
+    },
+    {
+      "table": "RAW.ZONES",
+      "rows": 265,
+      "export_sha256": "f85ece007040ec7d4110a148ed15d572597a804678f20d9eb16b6caf92723cb6"
+    },
+    {
+      "table": "META.LOADED_SOURCES",
+      "rows": 4,
+      "export_sha256": "563e81995fc2c3fdbb4fda6e4b10ea43ca2bd412e782d4be0f9d46c5871b00bd"
+    }
+  ],
+  "query_ids": [
+    "01c7bb34-0308-fe97-0011-d6c20001a0ea",
+    "01c7bb35-0308-fe97-0011-d6c20001a0f6",
+    "01c7bb35-0308-fe66-0011-d6c20001b0f2"
+  ],
+  "trip_partitions_verified": true
+}
