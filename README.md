@@ -60,6 +60,15 @@ visible. Exported small reports and the figure provide reproducible evidence.
 See [the model-flow schematic](docs/architecture.md), [warehouse design](docs/warehouse_design.md),
 and [performance/CI contract](docs/performance_and_ci.md).
 
+## Snowflake validation
+
+The full January–March 2025 snapshot was rebuilt in Snowflake, 
+and all three analytical marts (`mart_daily_activity`, `mart_route_monthly`, and `mart_route_month_comparison`) 
+reconciled with DuckDB under the documented tolerances (`all_equal: true`).
+See the [Snowflake design](docs/snowflake_design.md) and [Snowflake validation results](docs/snowflake_results/summary.md). 
+After evidence was saved, the dedicated Snowflake databases, role, warehouse, and resource monitor were removed. 
+The local DuckDB project and source data were retained.
+
 ## Reproduce the synthetic pipeline
 
 Requires Python 3.11 and Git. Run from the repository root on macOS/Linux:
@@ -129,9 +138,8 @@ for the rolling-window rule, input hashes and recorded plotting environment.
 
 ## Next milestones
 
-1. Bounded Snowflake extension: fixture parity, real-snapshot reconciliation and cloud setup/cleanup evidence.
-2. Interactive dashboard: activity and directed-route exploration, followed by cloud connection and hosting.
+1. Interactive dashboard: build local activity and directed-route exploration.
+2. Cloud connection and hosting: connect and deploy the dashboard after the local version is validated.
 
-See [the remaining roadmap](docs/remaining_roadmap.md). The local warehouse,
-analytical models, real results, benchmarks and CI workflow are implemented.
-Snowflake and the dashboard are planned extensions.
+See [the remaining roadmap](docs/remaining_roadmap.md). 
+Snowflake validation is complete; the interactive dashboard is next, followed by cloud connection and hosting.

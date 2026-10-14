@@ -1,0 +1,14 @@
+version: 2
+sources:
+  - name: cityflow_raw
+    schema: raw
+    tables:
+      - name: trips
+        description: One preserved source record, identified by partition, hash and physical ordinal.
+      - name: zones
+        description: Taxi zone reference snapshot.
+  - name: cityflow_meta
+    schema: meta
+    tables:
+      - name: loaded_sources
+        description: Current successful source version for each logical partition.

@@ -6,7 +6,7 @@ branch/PR with concrete validation, and reuse the existing definitions and evide
 | Phase | Focused time estimate | Deliverables | Completion gate |
 | --- | --- | --- | --- |
 | Portfolio presentation | 3–5 hours | Reproducible activity figure, clearer README, architecture/metric documentation | Real inputs reconcile; image/links reviewed; CI green; PR merged |
-| Bounded Snowflake extension | 6–10 hours | Isolated cloud environment, staged inputs, warehouse-compatible dbt transforms, reconciliation and cleanup evidence | Fixture parity first, real-snapshot parity, recorded configuration/query evidence and suspended/cleaned resources |
+| Bounded Snowflake extension | 6–10 hours | Isolated cloud environment, staged inputs, warehouse-compatible dbt transforms, reconciliation and cleanup evidence | Fixture parity first, real-snapshot parity, recorded configuration/query evidence and suspended/cleaned resources | complete; CI green; PR merged |
 | Local interactive dashboard | 6–10 hours | Date/month and directed-route exploration, activity/metric charts, cohort-aware comparisons | Filtered outputs reconcile with validated aggregates; zero/missing/under-threshold states are correctly displayed |
 | Cloud connection and hosting | Additional 4–8 hours | Dashboard connected to the accepted cloud environment and deployed on an agreed host | Access/configuration, secrets handling, refresh and cost behavior tested |
 
