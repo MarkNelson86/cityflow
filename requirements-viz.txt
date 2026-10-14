@@ -1,0 +1,2 @@
+# Optional plot-generation dependencies; the core CI environment stays separate.
+matplotlib==3.10.8

@@ -1,81 +1,137 @@
-# CityFlow: Urban Mobility Analytics
+# CityFlow — Urban Mobility Analytics
 
-A SQL analytics warehouse for recorded NYC yellow-taxi trips, built with
-Python, DuckDB and dbt Core.
+A reproducible SQL analytics pipeline for NYC yellow-taxi records: Python ingestion
+with source version tracking, a DuckDB/dbt warehouse, tested analytical marts and
+inspectable results. The project asks how recorded activity and directed route metrics vary
+across the first quarter of 2025.
 
-## Status
-Transactional ingestion, warehouse models and analytical SQL are implemented
-and validated on the frozen January–March 2025 snapshot.
+**January–March 2025 · 11,198,001 in-window records · 90 calendar days**
 
-## Planned analyses
-- Trip activity by date, hour, pickup zone and destination zone.
-- Route travel-time distributions and recorded fares.
-- Month comparisons with explicit coverage and quality reporting.
+![Daily recorded yellow-taxi trips with a trailing seven-day mean and monthly trips per calendar day](docs/figures/daily_activity_2025q1.png)
 
-## Local setup
-Requires Python 3.11, Git and internet access for the real-data download.
+The smoothing line is a full trailing seven-day mean. Monthly rates use every
+calendar day. See [figure definitions and provenance](docs/figure_design.md) and
+[the full results report](docs/results/overview.md).
+
+## Questions and findings
+
+- How did recorded trips per calendar day change across pickup months?
+- Which directed NYC zone pairs had the most recorded trips?
+- How did eligible route duration/fare distributions differ between adjacent months?
+
+| Pickup month | Recorded trips | Trips/calendar day | Eligible duration median | Eligible fare median |
+| --- | ---: | ---: | ---: | ---: |
+| January | 3,475,234 | 112,104 | 11.70 min | $12.80 |
+| February | 3,577,542 | 127,769 | 12.22 min | $13.50 |
+| March | 4,145,225 | 133,717 | 12.52 min | $14.10 |
+
+These are descriptive source-record patterns. Changes can reflect trip mix,
+payment/rate categories and time of day; they do not establish causal congestion
+effects, fare inflation or changes in all urban travel. Duration and fare metrics
+use independent eligible cohorts. See [analytical definitions](docs/analytics_design.md)
+for thresholds, grains and interpretation limits.
+
+## Engineering demonstrated
+
+| Capability | Implementation and evidence |
+| --- | --- |
+| Versioned ingestion | SHA-256 source tracking, unchanged-file skips, explicit partition replacement and transactional reconciliation |
+| Dimensional modeling | Source-preserving fact records, two directed zone joins, unique zone IDs and a complete date dimension |
+| Analytical SQL | Conditional cohorts, medians/p90, route/month grids, dense ranks, LAG and guarded percentage changes |
+| Validation | 15 pytest cases; 33 dbt data tests; synthetic boundary/zero/rank/coverage checks; real snapshot reconciliation |
+| Performance reasoning | Equivalent fact/mart count results, repeated warm reads, captured plans and separate build-cost evidence |
+| Continuous integration | GitHub Actions runs the fixture pipeline and retains logs, dbt artifacts and a labeled results report |
+
+The selected real analytics build (three models and 17 tests) took **6.859 seconds**
+on the development Mac. A warm benchmark returned the same **103,709 geographic
+route-month count rows** in median **0.823 s from facts** versus **0.077 s from the
+saved mart**, a **10.7× elapsed ratio for that read**. This measures reuse of stored
+aggregation and excludes its refresh cost. It is not an end-to-end speedup or a
+cross-machine performance claim. See [benchmark evidence](docs/performance/baseline/summary.md)
+and [the materialization decision](docs/performance/decision.md).
+
+## Architecture
+
+Python activates versioned raw source partitions. dbt standardizes fields, preserves
+records with explicit eligibility flags, adds zone details and builds daily and
+route-month marts. A complete calendar and route-month grid keep zero months
+visible. Exported small reports and the figure provide reproducible evidence.
+
+See [the model-flow schematic](docs/architecture.md), [warehouse design](docs/warehouse_design.md),
+and [performance/CI contract](docs/performance_and_ci.md).
+
+## Reproduce the synthetic pipeline
+
+Requires Python 3.11 and Git. Run from the repository root on macOS/Linux:
 
 ```bash
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-mkdir -p data/warehouse
-dbt debug --project-dir dbt --profiles-dir dbt
-python -m pytest -q
-python scripts/make_demo_sources.py
-python scripts/ingest_sources.py --config config/demo_sources.json --raw-dir data/demo_raw --database data/warehouse/cityflow_demo.duckdb
-dbt build --project-dir dbt --profiles-dir dbt/demo_profiles
-python scripts/warehouse_summary.py --database data/warehouse/cityflow_demo.duckdb --output reports/demo_quality_summary.csv
+python -m pip check
+python scripts/run_ci_checks.py
 ```
 
-## Data
-January–March 2025 yellow-taxi Parquet files and taxi-zone lookup from
-[NYC TLC](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
-Large source files and local databases are excluded from Git.
-See [the data contract](docs/data_contract.md) for grains and metric definitions.
+This uses generated fixture inputs and an isolated local database. Expected: 15
+pytest cases, eight models/33 dbt tests, and synthetic pickup-month counts **5/3/4**.
+The labeled fixture report is under `reports/ci/exports/overview.md`.
+For a repeat, use `--output-dir reports/ci-repeat` to preserve prior evidence.
+No real TLC downloads or cloud credentials are needed for this smoke path.
 
-## Roadmap
-Source audit -> manifest-backed ingestion -> dbt models -> quality tests
--> analytical SQL -> fixture/CI/release -> optional bounded Snowflake run.
+The [CI workflow](.github/workflows/ci.yml) runs those same checks on PRs and main
+with Python 3.11. Real-data validation remains a separate local checkpoint.
 
-## Warehouse design
-See [warehouse design](docs/warehouse_design.md), [source audit](docs/source_audit_2025q1.json), and [quality summary](docs/quality_summary_2025q1.csv).
+## Real snapshot and analytical outputs
 
-## Analytical SQL
+The frozen inputs are the January–March 2025 yellow-taxi Parquet files and 265-row
+taxi-zone lookup from [NYC TLC](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
+Source URLs, full active hashes and row counts are recorded in
+[export metadata](docs/results/run_metadata_2025q1.json). Large files/databases are
+ignored; small synthetic fixtures, code and selected evidence are committed.
 
-- Complete daily activity calendar with metric-specific cohorts.
-- Ordered route/month distributions, calendar-day rates and volume ranks.
-- Adjacent-month comparisons with explicit sample thresholds and zero-denominator handling.
+The raw input has 11,198,026 records. All raw records remain represented in the
+fact table; the 25 pickups outside the quarter are excluded from observed-activity
+summaries. Other anomalies use metric-specific flags rather than globally deleting
+records. Filenames identify source partitions; analytical months use actual pickup
+dates. Identical-looking source records are retained and given provenance-based IDs.
 
-See [analytical definitions](docs/analytics_design.md) and
-[recorded snapshot results](docs/results/overview.md).
+Once local inputs are available under `data/raw/`, run:
 
-To rebuild the analytical outputs after the warehouse is available:
+```bash
+python scripts/ingest_sources.py
+dbt build --project-dir dbt --profiles-dir dbt
+python scripts/export_analytics.py
+```
+
+When upstream models are already current, select only the analytical nodes:
 
 ```bash
 dbt build --project-dir dbt --profiles-dir dbt --select tag:analytics
 python scripts/export_analytics.py
-```
-
-## Performance and CI
-
-The [measurement and CI contract](docs/performance_and_ci.md) defines equivalent
-query comparisons, source/version checks and the synthetic regression pipeline.
-See [benchmark evidence and the materialization decision](docs/performance/decision.md).
-
-Run the same synthetic checks locally as on GitHub:
-
-```bash
-python scripts/run_ci_checks.py
-```
-
-After the real warehouse is built and tested, measure saved-mart reads against
-equivalent fact aggregations:
-
-```bash
 python scripts/benchmark_queries.py --output-dir reports/performance/new_run
 ```
 
-The [GitHub workflow](.github/workflows/ci.yml) runs on PRs and main with Python 3.11.
-CI uses committed/generated fixtures; real snapshot checks remain a local checkpoint.
-Benchmark timings are measurements, not machine-dependent CI pass/fail thresholds.
+See the source configuration and [data contract](docs/data_contract.md) for the
+snapshot specification. Source hashes identify inputs; coverage checks do not
+prove that the upstream vendor submissions capture every real-world taxi trip.
+Source-local wall-clock duration calculations retain daylight-saving ambiguity.
+
+## Regenerate the figure
+
+```bash
+python -m pip install -r requirements-viz.txt
+python scripts/plot_portfolio.py --output-dir reports/portfolio/new_render
+```
+
+The plot uses committed daily/monthly exports, validates their counts/calendar
+and writes PNG, SVG and figure metadata. See [figure definitions](docs/figure_design.md)
+for the rolling-window rule, input hashes and recorded plotting environment.
+
+## Next milestones
+
+1. Bounded Snowflake extension: fixture parity, real-snapshot reconciliation and cloud setup/cleanup evidence.
+2. Interactive dashboard: activity and directed-route exploration, followed by cloud connection and hosting.
+
+See [the remaining roadmap](docs/remaining_roadmap.md). The local warehouse,
+analytical models, real results, benchmarks and CI workflow are implemented.
+Snowflake and the dashboard are planned extensions.

@@ -1,0 +1,46 @@
+{
+  "dataset": "NYC TLC yellow-taxi snapshot, January\u2013March 2025",
+  "observed_records": 11198001,
+  "calendar_days": 90,
+  "window_days": 7,
+  "window_alignment": "trailing full window",
+  "monthly_rates": [
+    112104.32258064517,
+    127769.35714285714,
+    133716.93548387097
+  ],
+  "python_version": "3.11.4",
+  "matplotlib_version": "3.10.8",
+  "source_versions": [
+    {
+      "partition": "taxi_zones",
+      "sha256": "1a99e105092230f8620f301edcca7f80d3080642ff404d28ed957d3fa222c8ed",
+      "rows": 265,
+      "source_url": "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"
+    },
+    {
+      "partition": "yellow:2025-01",
+      "sha256": "9af277e4c0d3f9deb30644da822981e1e7df6af58313170fd3aa8a474485488a",
+      "rows": 3475226,
+      "source_url": "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-01.parquet"
+    },
+    {
+      "partition": "yellow:2025-02",
+      "sha256": "037cba555a73663f3a51a2c27816e40e3feb364769942bdf122b9da31e377bd3",
+      "rows": 3577543,
+      "source_url": "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-02.parquet"
+    },
+    {
+      "partition": "yellow:2025-03",
+      "sha256": "20c4b77cce457b7cfdae77c5069ca7dc91c167f876a41467f4502ab69487a186",
+      "rows": 4145257,
+      "source_url": "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-03.parquet"
+    }
+  ],
+  "input_sha256": {
+    "daily_csv": "30503cb123cdd73667cdef78fa96db6d180a0e507a93618b3538f58f9feb5c68",
+    "monthly_csv": "02d1f1ae90e818c2397db43bd2e724488ed4403c25e734c5cf96e78d6a131847",
+    "export_metadata": "87b7891846a3289517559abaa4dfbc980589784ebcd5bb46c4d5433fe80ce1c1"
+  },
+  "script_sha256": "587196a446ef08ec6cd1c4ee8cd6be79799577eeae8f73d0178e360058398907"
+}
