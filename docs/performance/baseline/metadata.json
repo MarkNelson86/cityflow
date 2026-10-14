@@ -1,0 +1,72 @@
+{
+  "label": "NYC TLC yellow-taxi snapshot, January\u2013March 2025",
+  "created_at_utc": "2026-10-14T04:10:38.731806+00:00",
+  "observed_records": 11198001,
+  "duckdb_version": "1.5.6",
+  "python_version": "3.11.4",
+  "os": "Darwin",
+  "os_release": "22.6.0",
+  "machine": "x86_64",
+  "logical_cpus": 4,
+  "threads": 2,
+  "memory_limit": "2GB",
+  "measured_repeats": 5,
+  "warmup_runs_per_query": 1,
+  "timing_scope": "execute + fetchall in one connection; preflight/verification/plans excluded",
+  "cache_scope": "warm repeats; operating-system caches are not reset",
+  "git_commit": "33990184d4a1e5c55902394139ac18ac2ff4b70e",
+  "working_tree_dirty": true,
+  "script_sha256": "7eaa8cb1bbe62cc8d735f8a9fdf3e106006bbe15c5adc7a935725c6b4d15df39",
+  "sources": [
+    {
+      "partition": "taxi_zones",
+      "sha256": "1a99e105092230f8620f301edcca7f80d3080642ff404d28ed957d3fa222c8ed",
+      "rows": 265
+    },
+    {
+      "partition": "yellow:2025-01",
+      "sha256": "9af277e4c0d3f9deb30644da822981e1e7df6af58313170fd3aa8a474485488a",
+      "rows": 3475226
+    },
+    {
+      "partition": "yellow:2025-02",
+      "sha256": "037cba555a73663f3a51a2c27816e40e3feb364769942bdf122b9da31e377bd3",
+      "rows": 3577543
+    },
+    {
+      "partition": "yellow:2025-03",
+      "sha256": "20c4b77cce457b7cfdae77c5069ca7dc91c167f876a41467f4502ab69487a186",
+      "rows": 4145257
+    }
+  ],
+  "queries": [
+    {
+      "query": "route_counts_from_fact",
+      "returned_rows": 103709,
+      "median_seconds": 0.8226326920002975,
+      "min_seconds": 0.8210112030001255,
+      "max_seconds": 0.852999837000425,
+      "result_sha256": "eb23bb47e69b7f1e3e75738ec1f6d0ccb6c04e18adcaa5ef68e4bf607a52515f",
+      "sql_sha256": "ebb6a4a5b13f7cf448431f8252e672ee904d4693eac1f25ed67567c461ff41b5"
+    },
+    {
+      "query": "route_counts_from_mart",
+      "returned_rows": 103709,
+      "median_seconds": 0.07688185900042299,
+      "min_seconds": 0.07038965199990344,
+      "max_seconds": 0.077632986000026,
+      "result_sha256": "eb23bb47e69b7f1e3e75738ec1f6d0ccb6c04e18adcaa5ef68e4bf607a52515f",
+      "sql_sha256": "e90d35bec61889c1e1afb4fee139a5958c5fbbfa14931bfafcfdbc1897c87527"
+    },
+    {
+      "query": "top_route_comparison",
+      "returned_rows": 3,
+      "median_seconds": 0.01843719000044075,
+      "min_seconds": 0.018025555000349414,
+      "max_seconds": 0.01856808299999102,
+      "result_sha256": "eb27639f9787c01ffc0ee241b005fe74dfe9d5c8a51ae1d682e48241dc95095a",
+      "sql_sha256": "6020202e151c4e31b4c3bfe834bc8ef87e4af22c4a806c73f5a56e9bad23dd79"
+    }
+  ],
+  "equivalent_count_results": true
+}

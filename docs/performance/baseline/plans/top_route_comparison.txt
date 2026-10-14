@@ -1,0 +1,234 @@
+┌─────────────────────────────────────┐
+│┌───────────────────────────────────┐│
+││    Query Profiling Information    ││
+│└───────────────────────────────────┘│
+└─────────────────────────────────────┘
+EXPLAIN ANALYZE -- Choose the most-recorded geographic route across the quarter, breaking ties by key. -- Output grain: its three consecutive pickup months, including any zero month. with chosen_route as (     select route_key     from analytics.mart_route_monthly     where snapshot_complete and is_geographic_route     group by route_key     order by sum(trip_count) desc, route_key     limit 1 ) select comparison.month_start, comparison.route_key,        comparison.trip_count, comparison.trips_per_calendar_day,        comparison.previous_trip_count, comparison.trip_count_change_pct,        comparison.duration_records, comparison.duration_sample_sufficient,        comparison.median_duration_minutes,        comparison.previous_median_duration_minutes,        comparison.median_duration_change_minutes from analytics.mart_route_month_comparison as comparison join chosen_route as chosen on comparison.route_key = chosen.route_key order by comparison.month_start 
+┌────────────────────────────────────────────────┐
+│┌──────────────────────────────────────────────┐│
+││              Total Time: 0.0159s             ││
+│└──────────────────────────────────────────────┘│
+└────────────────────────────────────────────────┘
+┌───────────────────────────┐
+│           QUERY           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│      EXPLAIN_ANALYZE      │
+│    ────────────────────   │
+│                           │
+│           0 rows          │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│             #0            │
+│__internal_decompress_strin│
+│           g(#1)           │
+│__internal_decompress_integ│
+│     ral_bigint(#2, 0)     │
+│             #3            │
+│__internal_decompress_integ│
+│     ral_bigint(#4, 0)     │
+│             #5            │
+│__internal_decompress_integ│
+│     ral_bigint(#6, 0)     │
+│             #7            │
+│             #8            │
+│             #9            │
+│            #10            │
+│                           │
+│                           │
+│                           │
+│           3 rows          │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│          ORDER_BY         │
+│    ────────────────────   │
+│ comparison.month_start ASC│
+│                           │
+│                           │
+│                           │
+│           3 rows          │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│             #0            │
+│__internal_compress_string_│
+│        uhugeint(#1)       │
+│__internal_compress_integra│
+│     l_usmallint(#2, 0)    │
+│             #3            │
+│__internal_compress_integra│
+│     l_usmallint(#4, 0)    │
+│             #5            │
+│__internal_compress_integra│
+│     l_usmallint(#6, 0)    │
+│             #7            │
+│             #8            │
+│             #9            │
+│            #10            │
+│                           │
+│                           │
+│                           │
+│           3 rows          │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│        month_start        │
+│         route_key         │
+│         trip_count        │
+│   trips_per_calendar_day  │
+│    previous_trip_count    │
+│   trip_count_change_pct   │
+│      duration_records     │
+│ duration_sample_sufficient│
+│  median_duration_minutes  │
+│previous_median_duration_mi│
+│           nutes           │
+│median_duration_change_minu│
+│            tes            │
+│                           │
+│                           │
+│                           │
+│           3 rows          │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         HASH_JOIN         │
+│    ────────────────────   │
+│      Join Type: INNER     │
+│                           │
+│        Conditions:        │
+│   route_key = route_key   ├──────────────┐
+│                           │              │
+│                           │              │
+│                           │              │
+│           3 rows          │              │
+│           0.00s           │              │
+└─────────────┬─────────────┘              │
+┌─────────────┴─────────────┐┌─────────────┴─────────────┐
+│         TABLE_SCAN        ││         PROJECTION        │
+│    ────────────────────   ││    ────────────────────   │
+│           Table:          ││             #0            │
+│     cityflow.analytics    ││                           │
+│.mart_route_month_compariso││                           │
+│             n             ││                           │
+│                           ││                           │
+│   Type: Sequential Scan   ││           0.00s           │
+│                           ││                           │
+│        Projections:       ││                           │
+│         route_key         ││                           │
+│        month_start        ││                           │
+│         trip_count        ││                           │
+│   trips_per_calendar_day  ││                           │
+│    previous_trip_count    ││                           │
+│   trip_count_change_pct   ││                           │
+│      duration_records     ││                           │
+│ duration_sample_sufficient││                           │
+│  median_duration_minutes  ││                           │
+│previous_median_duration_mi││                           │
+│           nutes           ││                           │
+│median_duration_change_minu││                           │
+│            tes            ││                           │
+│                           ││                           │
+│      Dynamic Filters:     ││                           │
+│    route_key='237->236'   ││                           │
+│                           ││                           │
+│                           ││                           │
+│                           ││                           │
+│           3 rows          ││           1 row           │
+│           0.00s           ││          (0.00s)          │
+└───────────────────────────┘└─────────────┬─────────────┘
+                             ┌─────────────┴─────────────┐
+                             │           TOP_N           │
+                             │    ────────────────────   │
+                             │           Top: 1          │
+                             │                           │
+                             │         Order By:         │
+                             │          #1 DESC          │
+                             │     cityflow.analytics    │
+                             │    .mart_route_monthly    │
+                             │       .route_key ASC      │
+                             │                           │
+                             │                           │
+                             │                           │
+                             │           1 row           │
+                             │           0.00s           │
+                             └─────────────┬─────────────┘
+                             ┌─────────────┴─────────────┐
+                             │         PROJECTION        │
+                             │    ────────────────────   │
+                             │__internal_decompress_strin│
+                             │           g(#0)           │
+                             │             #1            │
+                             │                           │
+                             │                           │
+                             │                           │
+                             │        43,598 rows        │
+                             │           0.00s           │
+                             └─────────────┬─────────────┘
+                             ┌─────────────┴─────────────┐
+                             │       HASH_GROUP_BY       │
+                             │    ────────────────────   │
+                             │         Groups: #0        │
+                             │                           │
+                             │        Aggregates:        │
+                             │    sum_no_overflow(#1)    │
+                             │                           │
+                             │                           │
+                             │                           │
+                             │        43,598 rows        │
+                             │           0.01s           │
+                             └─────────────┬─────────────┘
+                             ┌─────────────┴─────────────┐
+                             │         PROJECTION        │
+                             │    ────────────────────   │
+                             │         route_key         │
+                             │         trip_count        │
+                             │                           │
+                             │                           │
+                             │                           │
+                             │        130,794 rows       │
+                             │           0.00s           │
+                             └─────────────┬─────────────┘
+                             ┌─────────────┴─────────────┐
+                             │         PROJECTION        │
+                             │    ────────────────────   │
+                             │__internal_compress_string_│
+                             │        uhugeint(#0)       │
+                             │             #1            │
+                             │                           │
+                             │                           │
+                             │                           │
+                             │        130,794 rows       │
+                             │           0.00s           │
+                             └─────────────┬─────────────┘
+                             ┌─────────────┴─────────────┐
+                             │         TABLE_SCAN        │
+                             │    ────────────────────   │
+                             │           Table:          │
+                             │     cityflow.analytics    │
+                             │    .mart_route_monthly    │
+                             │                           │
+                             │   Type: Sequential Scan   │
+                             │                           │
+                             │        Projections:       │
+                             │         route_key         │
+                             │         trip_count        │
+                             │                           │
+                             │          Filters:         │
+                             │     snapshot_complete     │
+                             │    is_geographic_route    │
+                             │                           │
+                             │                           │
+                             │                           │
+                             │        130,794 rows       │
+                             │           0.00s           │
+                             └───────────────────────────┘
+
