@@ -162,6 +162,18 @@ service identity was tested from the hosted app before switching to credential-f
 snapshot mode and removing the dedicated Snowflake resources. The full local
 dashboard retains arbitrary date filters and the complete route catalog.
 
+Run the committed public snapshot locally without Snowflake:
+
+```bash
+python3.11 -m venv .venv-dashboard
+.venv-dashboard/bin/python -m pip install -r requirements-dashboard.txt
+CITYFLOW_HOSTING_BACKEND=snapshot .venv-dashboard/bin/python -m streamlit run cloud_dashboard/app.py
+```
+
+Open `http://localhost:8501` and stop the app with Ctrl+C. The snapshot and app
+are included in the repository; no Snowflake account, credentials, source files,
+or local DuckDB database are needed for this mode.
+
 See [deployment design](docs/hosting_design.md),
 [deployment results](docs/hosting_results/summary.md), and
 [deployment guide](docs/hosting_guide.md).

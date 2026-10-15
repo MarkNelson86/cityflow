@@ -24,21 +24,32 @@ routes, selected by quarter volume. It includes at most 315 route/month records.
 The existing local dashboard retains arbitrary date filters and the full route
 catalog. Public monthly medians are never combined into a quarter-wide median.
 
-The ZIP provides all additional code and SQL. It does not include source data,
-private keys or your account identifiers. The installer adds files and refuses
-to overwrite different existing files. Eight automated fixture checks passed
-when this package was prepared on Python 3.12. You must run them on your Mac;
-actual Snowflake execution and hosted deployment are gates in this guide.
+All application code, SQL, and tests are included in the repository. A fresh clone
+does not include TLC source files, DuckDB databases, private Snowflake profiles,
+or credentials; this guide gives commands to create each local prerequisite.
+Snowflake execution and hosted deployment still require your own account.
 
-Allow roughly 4–6 hours across several sessions; downloads, uploads and provider
-setup can add time. Keep your existing `.venv`, `.venv-snowflake` and
-`.venv-dashboard`. We reuse them; no fourth local environment is needed.
+To run only the committed public snapshot locally, without following the
+Snowflake steps, use this short path from the repository root:
+
+```bash
+python3.11 -m venv .venv-dashboard
+.venv-dashboard/bin/python -m pip install -r requirements-dashboard.txt
+CITYFLOW_HOSTING_BACKEND=snapshot .venv-dashboard/bin/python -m streamlit run cloud_dashboard/app.py
+```
+
+Open `http://localhost:8501` and stop with Control+C. No Snowflake account,
+database, source files, or credentials are needed for snapshot mode.
+
+Allow roughly 4–6 hours across several sessions; data downloads, uploads and
+provider setup can add time. The commands create separate `.venv`,
+`.venv-snowflake`, and `.venv-dashboard` environments in the repository root.
 
 ## Where each instruction runs
 
 | Label | Where | What happens there |
 | --- | --- | --- |
-| Terminal A | Mac terminal, `~/Desktop/projects/cityflow` | Git, installs, tests, exports, local app server |
+| Terminal A | Mac terminal, repository root | Git, installs, tests, exports, local app server |
 | Terminal B | Second Mac terminal tab | Health checks and opening the local app while A runs it |
 | Snowsight | Your Snowflake browser account, SQL workspace | Resource creation, serving tables, grants, pause/cleanup |
 | Streamlit Cloud | `https://share.streamlit.io` | GitHub connection, hosted app creation, settings/secrets |
@@ -55,112 +66,104 @@ Commands below do not include the `$` prompt; paste only their contents.
 
 ## Session A — prepare the branch and verify the code
 
-### 1. Start from the completed dashboard phase — Terminal A
+### 1. Clone the repository and install the base environment — Terminal A
 
-```bash
-cd ~/Desktop/projects/cityflow
+From the directory where you keep projects, run:
+
+~~~bash
+git clone https://github.com/MarkNelson86/cityflow.git
+cd cityflow
+git checkout -b feat/cloud-hosting
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m pip check
+mkdir -p reports/hosting
+python scripts/run_ci_checks.py --output-dir reports/ci-hosting-fixture
+~~~
+
+Expected: no broken requirements; 19 Python tests, 8 dbt models and 33 dbt tests
+pass; the fixture database is created under
+`reports/ci-hosting-fixture/work/pipeline_fixture.duckdb`. If you already have a
+clone, use this instead of the first three commands above (replace the path if
+your project directory is elsewhere). Confirm `git status` shows no uncommitted
+work before switching to `main`; if it does, stop and preserve that work first:
+
+~~~bash
+cd /path/to/cityflow
 git status --short --branch
-```
-
-If files are still modified, finish the dashboard commit/PR first. Merge that
-phase before beginning this one. Then:
-
-```bash
 git checkout main
 git pull --ff-only
 git checkout -b feat/cloud-hosting
-source .venv/bin/activate
-```
+~~~
 
-If `feat/cloud-hosting` already exists, use `git checkout feat/cloud-hosting`
-instead of creating it again. Confirm prerequisites with visible output:
+Continue with `python3.11 -m venv .venv`. If the branch already exists, use
+`git checkout feat/cloud-hosting` instead of creating it again.
 
-```bash
-for file in docs/dashboard_results/summary.md scripts/export_analytics.py scripts/snowflake_snapshot.py dashboard/app.py dbt_snowflake/dbt_project.yml reports/snowflake/profiles/profiles.yml; do
+### 2. Confirm the project files are already in the clone — Terminal A
+
+~~~bash
+for file in docs/dashboard_results/summary.md scripts/export_analytics.py scripts/snowflake_snapshot.py dashboard/app.py cloud_dashboard/app.py cloud_dashboard/public_snapshot.json dbt_snowflake/dbt_project.yml sql/snowflake/hosting_setup.sql; do
   if test -f "$file"; then
     echo "FOUND: $file"
   else
     echo "MISSING: $file"
   fi
 done
-```
+~~~
 
-All must say FOUND. The ignored profile is your existing working password-auth
-profile. Do not replace it with the old browser-auth example.
+All must say FOUND. There is no ZIP package or install script: these files are
+tracked in Git. The real-data files, local database, and private profile are
+created in later steps.
 
-### 2. Install the additive package — Terminal A
+### 3. Install the Snowflake and dashboard environments — Terminal A
 
-Download `cityflow_hosting.zip` to `~/Downloads`. Then:
+The base environment from Step 1 runs the local pipeline and builds the fixture.
+Create two additional environments for the Snowflake adapter/loader and dashboard:
 
-```bash
-.venv/bin/python -m zipfile -e ~/Downloads/cityflow_hosting.zip ~/Downloads
-.venv/bin/python ~/Downloads/cityflow_hosting/install.py --repo "$PWD" --check
-.venv/bin/python ~/Downloads/cityflow_hosting/install.py --repo "$PWD"
-```
-
-Expected: preflight passes and the new files are installed. If it reports an
-existing different file, stop and inspect that file; it has copied nothing.
-Keep installation packages in Downloads rather than committing them to Git.
-
-### 3. Confirm ignore rules and the hosting dependencies — Terminal A
-
-```bash
+~~~bash
 mkdir -p reports/hosting
-.venv/bin/python - <<'PY'
-from pathlib import Path
-p = Path('.gitignore')
-text = p.read_text() if p.exists() else ''
-rules = ['reports/', '.streamlit/secrets.toml', '*.p8', '*.pem', '*.key',
-         '__pycache__/', '*.py[cod]', '.pytest_cache/']
-missing = [r for r in rules if r not in text.splitlines()]
-if missing:
-    p.write_text(text.rstrip() + '\n\n# Private hosting credentials and generated reports\n' + '\n'.join(missing) + '\n')
-print('Ignore rules checked.')
-PY
-git check-ignore reports/hosting/private-test.p8 .streamlit/secrets.toml
+.venv/bin/python -m venv .venv-snowflake
+.venv-snowflake/bin/python -m pip install -r requirements.txt
+.venv-snowflake/bin/python -m pip install dbt-snowflake==1.12.2 snowflake-connector-python==3.18.1
+.venv-snowflake/bin/python -m pip check
+.venv/bin/python -m venv .venv-dashboard
+.venv/bin/python -c "import duckdb; print('duckdb==' + duckdb.__version__)" > reports/hosting/duckdb-constraint.txt
+.venv-dashboard/bin/python -m pip install -r requirements-dashboard.txt -c reports/hosting/duckdb-constraint.txt
 .venv-dashboard/bin/python -m pip install -r cloud_dashboard/requirements.txt
 .venv-dashboard/bin/python -m pip check
 .venv-dashboard/bin/python -m pip freeze > reports/hosting/environment.txt
-```
+git check-ignore .venv-snowflake/ .venv-dashboard/ reports/ .streamlit/secrets.toml
+~~~
 
-Expected: both private paths are printed by `git check-ignore`, and pip reports
-no broken requirements. These are tested dependency pins, not claims about the
-latest releases. Your DuckDB version remains as installed for the local dashboard.
+Expected: both pip check commands report no broken requirements, and the final
+command lists all four ignored paths. The dashboard and Snowflake dependencies
+stay in separate virtual environments. The DuckDB constraint matches the version
+installed in the base environment.
 
-### 4. Build a fresh fixture and run eight hosting checks — Terminal A
+### 4. Run the hosting fixture checks — Terminal A
 
-Keep `.venv` active so the existing CI runner finds its original dbt executable:
+Step 1 already built the synthetic DuckDB fixture and ran the base test suite.
+Point the hosting checks at that fixture:
 
-```bash
-which dbt
-.venv/bin/python scripts/run_ci_checks.py --output-dir reports/ci-hosting-fixture
+~~~bash
 export CITYFLOW_DASHBOARD_FIXTURE_DB="$PWD/reports/ci-hosting-fixture/work/pipeline_fixture.duckdb"
 .venv-dashboard/bin/python -m pytest cloud_dashboard/checks.py -q --junitxml=reports/hosting/pytest.xml
-```
+~~~
 
-Expected: existing local CI passes (19 Python tests, eight models, 33 dbt tests)
-and **eight hosting checks pass**.
-If the report directory already exists and the CI runner refuses it, use
-`reports/ci-hosting-fixture-repeat` and update the environment variable accordingly.
-No Snowflake connection occurs in these tests.
+Expected: eight hosting checks pass. No Snowflake connection occurs in these tests.
 
-### 5. Make the Streamlit config portable — Terminal A
+### 5. Check that the shared Streamlit config is host-compatible — Terminal A
 
-The local dashboard config binds to `127.0.0.1`. We will keep that explicit in
-local launch commands and remove it from the shared config used by the host:
+The committed config contains no server address override, so it works for both
+local launches and Streamlit Community Cloud. Local launch commands below bind
+to loopback explicitly. Confirm the config has no fixed address:
 
-```bash
-.venv/bin/python - <<'PY'
-from pathlib import Path
-p = Path('.streamlit/config.toml')
-lines = p.read_text().splitlines()
-p.write_text('\n'.join(line for line in lines if not line.strip().startswith('address =')) + '\n')
-print('Removed the server address override; local launches specify loopback explicitly.')
-PY
-git diff -- .streamlit/config.toml
-```
+~~~bash
+.venv/bin/python -c "from pathlib import Path; lines=Path('.streamlit/config.toml').read_text().splitlines(); print('Address override found' if any(x.strip().startswith('address =') for x in lines) else 'OK: no address override')"
+~~~
 
-Expected: only the address line is removed. No local app server is running yet.
+Expected: OK: no address override. Do not edit the committed config for this step.
 
 ## Session B — rebuild the dedicated cloud snapshot
 
@@ -194,44 +197,39 @@ SELECT CURRENT_USER() AS SQL_USERNAME,
        CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS CONNECTION_ACCOUNT;
 ```
 
-### 7. Restore your private human login settings — Terminal A
+### 7. Create a private dbt profile and enter your login values — Terminal A
 
-Replace the account/user placeholders with the same values that worked during
-the Snowflake phase. `CITYFLOW_REAL` is a literal project database name, not a
-placeholder. Keep these values out of committed files.
+The committed profile is a template. Copy it into the ignored reports directory;
+the template reads account, username and password from environment variables. Use
+the same account and username you confirmed in Snowsight. Keep the password out
+of files and never print it.
 
-```bash
+~~~bash
+mkdir -p reports/snowflake/profiles
+cp sql/snowflake/profiles.example.yml reports/snowflake/profiles/profiles.yml
+chmod 600 reports/snowflake/profiles/profiles.yml
 export CITYFLOW_SF_ACCOUNT='YOUR_ORGANIZATION-YOUR_ACCOUNT'
 export CITYFLOW_SF_USER='YOUR_SQL_USERNAME'
 export CITYFLOW_SF_DATABASE='CITYFLOW_REAL'
-```
-
-If your working profile/loader uses `CITYFLOW_SF_PASSWORD`, re-enter it privately:
-
-```bash
-read -s -p "Snowflake password: " CITYFLOW_SF_PASSWORD
-echo
+printf 'Snowflake password: '
+read -s CITYFLOW_SF_PASSWORD
+printf '\n'
 export CITYFLOW_SF_PASSWORD
-```
+~~~
 
-Use the environment variable name actually referenced by your existing working
-profile and Python `connect()` function if yours differs. Do not print the password.
-The human password is used only for rebuilding; it never goes into the hosted app.
-Both dbt and the loader must retain their independent working password-auth edits.
+Replace the first three values with yours. CITYFLOW_REAL is the literal project
+database name. The profile uses Snowflake username/password authentication, which
+also matches the Python loader. The password stays in this terminal session's
+environment; the hosted app uses a separate service key later.
 
-Create a private rendered setup file, without editing the committed template:
+Check that the private profile exists and is ignored:
 
-```bash
-.venv/bin/python - <<'PY'
-import os
-from pathlib import Path
-user = '"' + os.environ['CITYFLOW_SF_USER'].replace('"', '""') + '"'
-text = Path('sql/snowflake/hosting_rebuild.sql').read_text().replace('YOUR_SQL_USERNAME', user)
-Path('reports/hosting/rebuild.private.sql').write_text(text)
-print('Created ignored reports/hosting/rebuild.private.sql')
-PY
-open -a TextEdit reports/hosting/rebuild.private.sql
-```
+~~~bash
+test -s reports/snowflake/profiles/profiles.yml && echo 'Private dbt profile created'
+git check-ignore reports/snowflake/profiles/profiles.yml
+~~~
+
+The second command must print the profile path.
 
 ### 8. Recreate the real database and controlled loading warehouse — Snowsight
 
@@ -251,6 +249,19 @@ auto-resume TRUE, query acceleration FALSE, timeout 600 seconds, assigned monito
 The grant to your human user is intentional; no SYSADMIN inheritance is added.
 
 ### 9. Verify the human connection and export fresh inputs — Terminal A
+
+The Snowflake export reads the full local real DuckDB warehouse. A fresh clone
+does not have that ignored database. If it is missing, first follow the
+“Rebuild the real local warehouse” section in `docs/dashboard_guide.md`, which
+downloads the three TLC source files and builds the warehouse. Before continuing,
+confirm the database exists and is nonempty:
+
+```bash
+test -s data/warehouse/cityflow.duckdb && echo 'Real local warehouse found'
+```
+
+This step is required before creating Snowflake resources; the committed public
+aggregate snapshot alone cannot supply the raw projection for migration.
 
 ```bash
 .venv-snowflake/bin/dbt debug --project-dir dbt_snowflake --profiles-dir reports/snowflake/profiles
@@ -300,8 +311,9 @@ cp dbt_snowflake/target/run_results.json reports/hosting/dbt_artifacts/
 The loader is one-shot. If a load fails after creating tables, it will refuse
 another load into those schemas. Inspect the error and partial state; do not
 append data or rerun the entire setup blindly. If authentication returns the
-earlier SAML error, the loader/profile reverted to externalbrowser: restore
-their working password-auth settings before retrying.
+SAML identity-provider error, verify that the private dbt profile still uses
+`authenticator: snowflake` and that `CITYFLOW_SF_PASSWORD` is exported in the
+same terminal session before retrying.
 
 ## Session C — serving tables, key pair and cloud-to-local verification
 
@@ -744,9 +756,9 @@ service identity was tested from the hosted app before switching to credential-f
 snapshot mode and removing the dedicated Snowflake resources. The full local
 dashboard retains arbitrary date filters and the complete route catalog.
 
-See [deployment design](docs/hosting_design.md),
-[deployment results](docs/hosting_results/summary.md), and
-[deployment guide](docs/hosting_guide.md).
+See [deployment design](hosting_design.md),
+[deployment results](hosting_results/summary.md), and
+[deployment guide](hosting_guide.md).
 ```
 
 Keep all existing local reproduction commands, Snowflake/dashboard evidence

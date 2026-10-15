@@ -4,10 +4,9 @@ Prepared for the completed Snowflake validation phase, 14 October 2026.
 
 ## What this phase delivers
 
-Build and validate a local interactive dashboard for the retained January–March
-2025 DuckDB snapshot. The supplied package contains the app, read-only SQL queries,
-13 dashboard tests, an automated data checker, a GitHub dashboard workflow and
-design documentation. You install these additions into the existing repository.
+Build and validate a local interactive dashboard for the January–March 2025
+DuckDB snapshot. The dashboard code, tests, workflow, and documentation are already
+included in this repository; there is no ZIP package to install.
 
 The interface has two views:
 
@@ -17,22 +16,20 @@ The interface has two views:
    route mart, zero-trip months, eligible sample sizes and guarded adjacent-month
    comparisons. Unmapped/outside-city routes are available explicitly.
 
-The next phase after this one is **cloud connection and public hosting**. Your
-Snowflake resources stay removed during this local phase. Maps, forecasting,
-additional data and public deployment are separate future work.
+This guide reproduces the completed local-dashboard checks from a repository
+clone. The separate [hosting guide](hosting_guide.md) covers rebuilding the
+dedicated Snowflake environment and deploying the public snapshot.
 
 | Session | Work | Approximate time | Gate |
 | --- | --- | --- | --- |
-| A | Branch, install package, prepare dashboard environment | 20–40 min | Clean install and dependency check |
+| A | Clone repository and prepare dashboard environment | 20–40 min | Clean install and dependency check |
 | B | Build fixture, run tests, review fixture in browser | 30–60 min | 19 base tests + 13 dashboard tests; known fixture answers |
-| C | Check retained real warehouse and review real interface | 30–60 min | Monthly known answers and sampled route checks pass |
-| D | Save evidence, update docs, commit and merge | 30–60 min | Green existing CI and dashboard workflow; reviewed PR |
+| C | Rebuild or check the real warehouse and review the interface | 30–60 min | Monthly known answers and sampled route checks pass |
+| D | Optional: repeat checks and inspect generated evidence | 15–30 min | Reports are written under ignored `reports/` |
 
-Time estimates assume the existing pipeline and retained real DuckDB database are
-available. Rebuilding a missing local warehouse or resolving a dependency issue
-adds time. This package has been tested here on reconstructed dbt-built fixture
-data on Python 3.12.14 with DuckDB 1.4.1; your Python 3.11 environment and full
-11-million-record warehouse are verified by the commands below on your Mac.
+Time estimates assume the project dependencies install successfully. A fresh
+clone does not contain the ignored raw TLC files or the full local DuckDB database;
+the real-data section below provides the download and rebuild commands.
 
 ## Where you work
 
@@ -46,102 +43,58 @@ root unless a step says otherwise. When Streamlit is running, Terminal A will no
 return a shell prompt until you stop it with Ctrl+C. Do not paste shell commands
 into the running server. Use Terminal B or stop A's server first.
 
-`.venv`, `.venv-snowflake` and the new `.venv-dashboard` are sibling directories in
-the project root. The existing `.venv` runs ingestion/dbt/base CI. Explicit
-`.venv-dashboard/bin/python` commands run the app and app tests. You do not activate
-the dashboard environment or nest it inside another environment.
+`.venv` and `.venv-dashboard` are separate directories in the project root. The
+first runs ingestion/dbt/base CI. Explicit `.venv-dashboard/bin/python` commands
+run the app and app tests. You do not nest one environment inside another.
 
-## Session A — prepare the branch and app
+## Run the committed public snapshot (no Snowflake)
 
-### 1. Confirm the Snowflake changes are committed and merged — Terminal A
+This quick start runs the published aggregate snapshot in `cloud_dashboard/`.
+It does not need source data, a DuckDB database, a Snowflake account, or
+credentials. Run from the repository root on macOS/Linux:
 
 ```bash
-cd ~/Desktop/projects/cityflow
-git status --short
-git branch --show-current
+python3.11 -m venv .venv-dashboard
+.venv-dashboard/bin/python -m pip install -r requirements-dashboard.txt
+CITYFLOW_HOSTING_BACKEND=snapshot .venv-dashboard/bin/python -m streamlit run cloud_dashboard/app.py
 ```
 
-The first command should show no pending changes. If Snowflake work is still
-uncommitted or its PR is unmerged, finish the previous guide's commit/PR step first.
-Do not hide those changes with a stash to proceed. If there is an existing PR for
-the current branch, these commands inspect it:
+Open `http://localhost:8501`. Stop the app with **Control+C** in the terminal.
+The app should show “Published Snowflake aggregate snapshot · no live database
+connection.” This committed snapshot contains 11,198,001 observed trips from
+January–March 2025. The environment directory is ignored by Git.
+
+## Session A — prepare a local dashboard environment
+
+### 1. Clone the repository and install the project environment — Terminal A
+
+Run from the directory where you keep projects. If you already cloned the
+repository, omit `git clone` and `cd cityflow`, then run the remaining commands
+from the repository root.
 
 ```bash
-gh pr view
-gh pr checks
-```
-
-Once Snowflake is merged, prepare the new branch:
-
-```bash
-git switch main
-git pull --ff-only
-test -f docs/snowflake_results/summary.md
-test -f scripts/export_analytics.py
-git switch -c feat/dashboard
+git clone https://github.com/MarkNelson86/cityflow.git
+cd cityflow
+python3.11 -m venv .venv
 source .venv/bin/activate
-python --version
-which dbt
+python -m pip install -r requirements.txt
+python -m pip check
 ```
 
-The two `test` commands succeed silently. If a file is absent on main, check the
-Snowflake merge before continuing. Python should be your existing 3.11 environment;
-`which dbt` should end in `cityflow/.venv/bin/dbt`. This matters because the base CI
-script finds `dbt` through your terminal's PATH.
+Expected: `No broken requirements found.` The repository already contains the
+dashboard app, checks, Streamlit configuration, and CI workflow. No installer
+ZIP or prior checkout is required.
 
-If `feat/dashboard` already exists from an interrupted start, inspect it before
-continuing and use `git switch feat/dashboard` instead of creating it again.
-
-### 2. Download and unpack the package — Terminal A
-
-Download `cityflow_dashboard.zip` from this conversation into `~/Downloads`.
-If your browser adds a suffix, rename the downloaded ZIP to that exact name.
-Then run:
+### 2. Confirm local-only files are ignored — Terminal A
 
 ```bash
-.venv/bin/python -m zipfile -e ~/Downloads/cityflow_dashboard.zip ~/Downloads
-ls ~/Downloads/cityflow_dashboard
+git check-ignore .venv-dashboard/ reports/ .streamlit/secrets.toml
 ```
 
-Expected folder contents: `GUIDE.md`, `install.py`, `manifest.json`, and `files/`.
-You can read the standalone guide or `GUIDE.md`; they contain the same instructions.
+These paths should be ignored. The public `.streamlit/config.toml` stays in Git;
+credentials are unnecessary for the local dashboard.
 
-### 3. Check and install the additive files — Terminal A
-
-```bash
-.venv/bin/python ~/Downloads/cityflow_dashboard/install.py --repo "$PWD" --check
-.venv/bin/python ~/Downloads/cityflow_dashboard/install.py --repo "$PWD"
-git status --short
-```
-
-The preflight validates all package hashes and destinations before copying any
-files. It refuses to overwrite an existing different file. If it reports a
-conflict, inspect the named file; do not overwrite it blindly. Matching files are
-safe to retain on a repeat install.
-
-You should see additions under `dashboard/`, `.streamlit/`, `scripts/`, `docs/`,
-`.github/workflows/`, and `requirements-dashboard.txt`. Existing dbt models,
-Snowflake SQL, README figure and source files are not replaced.
-
-### 4. Ignore the app environment and runtime outputs — Terminal A
-
-```bash
-.venv/bin/python - <<'PY'
-from pathlib import Path
-path = Path('.gitignore')
-text = path.read_text() if path.exists() else ''
-lines = set(text.splitlines())
-needed = [p for p in ('.venv-dashboard/', 'reports/', '.streamlit/secrets.toml', '__pycache__/', '*.py[cod]', '.pytest_cache/') if p not in lines]
-if needed:
-    path.write_text(text.rstrip() + '\n\n# Local dashboard environment and runtime files\n' + '\n'.join(needed) + '\n')
-print('Dashboard ignore rules are present.')
-PY
-```
-
-The supplied `.streamlit/config.toml` is public app configuration and belongs in
-Git. No credentials or secrets are needed for this phase.
-
-### 5. Create the dashboard environment and match DuckDB — Terminal A
+### 3. Create the dashboard environment and match DuckDB — Terminal A
 
 ```bash
 .venv/bin/python -m venv .venv-dashboard
@@ -176,7 +129,7 @@ dependencies into `.venv-snowflake`.
 
 ## Session B — prove the synthetic dashboard first
 
-### 6. Build a fresh fixture with the established pipeline — Terminal A
+### 4. Build a fresh fixture with the established pipeline — Terminal A
 
 Check that no ingestion/dbt process is currently writing the real warehouse. This
 step creates its own isolated fixture database; it does not replace the real data.
@@ -195,7 +148,7 @@ overwrite it. On a repeat, use `reports/ci-dashboard-fixture-repeat` as the outp
 directory and update the fixture path in the following exports to that directory.
 Do not delete previous evidence merely to rerun the command.
 
-### 7. Run the dashboard tests and fixture data checker — Terminal A
+### 5. Run the dashboard tests and fixture data checker — Terminal A
 
 ```bash
 export CITYFLOW_DASHBOARD_FIXTURE_DB="$PWD/reports/ci-dashboard-fixture/work/pipeline_fixture.duckdb"
@@ -213,7 +166,7 @@ verifies known monthly counts/cohorts/percentiles, a partial date window and
 independent fact-level route samples. It does not assert full new cross-engine
 parity; that evidence belongs to the completed Snowflake phase.
 
-### 8. Start the fixture app — Terminal A
+### 6. Start the fixture app — Terminal A
 
 ```bash
 export CITYFLOW_DASHBOARD_DATABASE="$CITYFLOW_DASHBOARD_FIXTURE_DB"
@@ -228,7 +181,7 @@ export CITYFLOW_DASHBOARD_DATASET='fixture'
 Leave Terminal A running. The displayed URL should be `http://127.0.0.1:8501`.
 The loopback address keeps this development server on your own computer.
 
-### 9. Open and inspect the fixture — Terminal B, then Browser
+### 7. Open and inspect the fixture — Terminal B, then Browser
 
 Open a second terminal tab. Run:
 
@@ -260,14 +213,39 @@ source coverage as confirmed zero. The automated tests separately prove the
 incomplete/stale-data refusal. Route metrics are suppressed independently for
 duration and fare, using their own eligible cohort sizes.
 
-### 10. Stop the fixture server — Terminal A
+### 8. Stop the fixture server — Terminal A
 
 Press **Ctrl+C** in Terminal A. Wait for the shell prompt. Closing the browser tab
 alone does not stop Streamlit. You can leave the browser tab open for the real run.
 
-## Session C — validate and inspect the retained real warehouse
+## Session C — rebuild or inspect the real warehouse
 
-### 11. Select the real database and run read-only checks — Terminal A
+### 9. Rebuild the real local warehouse if it is missing — Terminal A
+
+A fresh clone has no TLC source files or real DuckDB database because both are
+ignored by Git. Skip this step if `data/warehouse/cityflow.duckdb` already exists
+and contains the validated real snapshot. Otherwise download the three source
+partitions and zone lookup, then build the local warehouse:
+
+```bash
+mkdir -p data/raw
+for month in 2025-01 2025-02 2025-03; do
+  curl -fL "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_${month}.parquet" \
+    -o "data/raw/yellow_tripdata_${month}.parquet"
+done
+curl -fL https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv \
+  -o data/raw/taxi_zone_lookup.csv
+source .venv/bin/activate
+python scripts/ingest_sources.py
+dbt build --project-dir dbt --profiles-dir dbt --vars '{analytics_min_records: 30}'
+python scripts/export_analytics.py --output-dir reports/dashboard/local_rebuild
+```
+
+Expected: source rows reconcile to 11,198,026; dbt reports eight models and 33
+data tests passed; the analytics export succeeds with the threshold set to 30.
+The public snapshot quick start above does not require this full-data download.
+
+### 10. Select the real database and run read-only checks — Terminal A
 
 ```bash
 export CITYFLOW_DASHBOARD_DATABASE="$PWD/data/warehouse/cityflow.duckdb"
@@ -276,8 +254,7 @@ test -f "$CITYFLOW_DASHBOARD_DATABASE"
 .venv-dashboard/bin/python scripts/check_dashboard.py \
   --dataset real \
   --database "$CITYFLOW_DASHBOARD_DATABASE" \
-  --report reports/dashboard/real_validation.json \
-  --write-summary docs/dashboard_results/summary.md
+  --report reports/dashboard/real_validation.json
 ```
 
 Expected report counts:
@@ -294,9 +271,8 @@ Expected report counts:
 
 The checker also validates the monthly eligible cohort counts, median duration,
 p90 duration and median fare against the earlier established values. It writes
-the summary template with actual data/environment results. It refuses to overwrite
-an existing summary. On a repeat, omit `--write-summary`, retain your manual notes,
-and review the new JSON separately.
+the new report only under ignored reports/. The repository already contains the
+completed summary; do not overwrite it when reproducing the check.
 
 If the retained real database is elsewhere, replace only
 `CITYFLOW_DASHBOARD_DATABASE` with its actual path. Never select the fixture path
@@ -306,7 +282,7 @@ Do not use fixture threshold **2** when rebuilding real models.
 If the database is absent or stale, see troubleshooting below before proceeding.
 You do not need to recreate the deleted Snowflake objects.
 
-### 12. Launch and inspect the real app — Terminal A, then Browser
+### 11. Launch and inspect the real app — Terminal A, then Browser
 
 ```bash
 .venv-dashboard/bin/python -m streamlit run dashboard/app.py \
@@ -349,184 +325,24 @@ urban mobility. Activity date filters do not change the whole-month route view.
 The underlying route mart contains medians even for small cohorts, so the app
 specifically masks them before displaying or downloading the selected route.
 
-## Session D — evidence, docs and Git
+## After running the dashboard
 
-### 13. Stop the app and retain small validation evidence — Terminal A
+Stop Streamlit with Control+C in the terminal running the app. Fresh test reports,
+logs, fixture databases and environment freezes are written under reports/, which
+is ignored by Git. The committed dashboard results already describe the completed
+validation; running this guide does not require editing README.md, the roadmap, or
+those committed result files.
 
-Press Ctrl+C and wait for the shell prompt. Then run:
+If you change project code and want to contribute the change, create a branch from
+the current main branch, rerun the relevant tests, and review your actual diff
+before opening a pull request. Use git checkout commands for branch operations:
 
-```bash
-mkdir -p docs/dashboard_results
-cp reports/dashboard/fixture_validation.json docs/dashboard_results/
-cp reports/dashboard/real_validation.json docs/dashboard_results/
-cp reports/dashboard/dashboard_environment.txt docs/dashboard_results/
-open -a TextEdit docs/dashboard_results/summary.md
-```
-
-The summary is already generated by step 11. In the editor, replace its test-count
-placeholder with the **actual dashboard test result**, record the browser review
-date/time/timezone, and mark each manual review row Pass only if you performed it.
-Describe any unresolved issue instead of marking it passed. Save the file.
-
-Full pytest/dbt logs, JUnit XML, databases and large route exports stay under ignored
-reports/data directories. Small JSON evidence, environment versions and the results
-summary are enough for this phase. There is no required screenshot or external login.
-
-### 14. Update README and roadmap — Terminal A, then Editor
-
-This command adds a local-dashboard section and changes Next milestones while
-preserving the existing figure and reproduction sections. Review its diff afterward.
-
-```bash
-.venv/bin/python - <<'PY'
-from pathlib import Path
-import re
-path = Path('README.md')
-text = path.read_text()
-section = '''## Local dashboard
-
-The local Streamlit dashboard supports pickup-date activity exploration and directed-route
-month comparisons using the validated DuckDB snapshot. It preserves eligible cohorts,
-zero-trip months, sample thresholds and undefined growth from zero. See the
-[dashboard guide](docs/dashboard_guide.md), [design](docs/dashboard_design.md), and
-[validation results](docs/dashboard_results/summary.md).
-
-Run from the repository root after installing the dashboard environment:
-
-CODE_FENCEbash
-.venv-dashboard/bin/python -m streamlit run dashboard/app.py
-CODE_FENCE
-
-Open http://127.0.0.1:8501. Stop the server with Ctrl+C in its terminal.
-
-'''.replace('CODE_FENCE', chr(96) * 3)
-if '## Local dashboard' not in text:
-    anchor = '## Next milestones'
-    if anchor in text:
-        text = text.replace(anchor, section + anchor, 1)
-    else:
-        text = text.rstrip() + '\n\n' + section
-next_block = '''## Next milestones
-
-1. Cloud connection and hosting: connect the validated dashboard to the accepted
-   cloud environment and deploy it with tested configuration, refresh and cost behavior.
-
-See [the remaining roadmap](docs/remaining_roadmap.md). Local dashboard validation
-and Snowflake parity are complete. The dedicated Snowflake resources were removed
-after validation; cloud infrastructure will be rebuilt when needed for hosting.
-
-'''
-if '## Next milestones' in text:
-    text = re.sub(r'^## Next milestones\n.*?(?=^## |\Z)', next_block,
-                  text, count=1, flags=re.M | re.S)
-else:
-    text += next_block
-path.write_text(text.rstrip() + '\n')
-print('README dashboard section and next milestone updated; review the diff.')
-PY
-open -a TextEdit docs/remaining_roadmap.md
-```
-
-In the roadmap editor, mark **Local interactive dashboard complete** and **Cloud
-connection and hosting next**. Keep Snowflake marked complete and its resources
-removed. Replace the forward-looking dashboard phase text with this completion note:
-
-```markdown
-## Local dashboard phase — complete
-
-The local dashboard provides date-filtered activity and directed-route monthly
-exploration from the retained DuckDB snapshot. Fixture controls and metric boundaries
-are tested; real activity and sampled route outputs reconcile with validated aggregates.
-See [dashboard results](dashboard_results/summary.md) and
-[dashboard design](dashboard_design.md).
-
-## Cloud connection and hosting — next
-
-Rebuild the dedicated cloud environment when needed, add a cloud data adapter,
-and deploy the validated dashboard. Test access, secret handling, refresh behavior,
-availability and warehouse costs before calling the hosted product complete.
-```
-
-Update the corresponding table rows too. Keep existing estimates and any other
-roadmap work that is still relevant. Save the file, then review:
-
-```bash
-git diff -- README.md docs/remaining_roadmap.md
-git diff --check
-```
-
-The original local commands and README figure should remain in the diff's context,
-with no deletion of those sections. Only label this phase complete after the earlier
-gates pass. A local dashboard is not yet a publicly hosted application.
-
-### 15. Stage and review the intended additions — Terminal A
-
-```bash
+~~~bash
 git status --short
-git add .gitignore README.md docs/remaining_roadmap.md \
-  requirements-dashboard.txt .streamlit/config.toml dashboard \
-  scripts/check_dashboard.py docs/dashboard_design.md docs/dashboard_guide.md \
-  docs/dashboard_results .github/workflows/dashboard.yml
-git diff --cached --stat
-git diff --cached --check
-git diff --cached --name-only
-git status --short
-```
-
-Expected staged files are app code/tests, the dashboard requirements/config/workflow,
-README/roadmap/design/guide and small evidence. No `.venv*`, `.duckdb`, raw Parquet,
-full route exports, credentials or unrelated changes should be staged. Do not use
-`git add .` to sweep runtime outputs into the commit.
-
-The GitHub dashboard workflow will repeat the established fixture pipeline and the
-13 app tests in isolated environments. No real TLC download or Snowflake login is
-required on GitHub. If you changed app/query code after the earlier checks, rerun
-step 7 and affected real checks before committing; documentation-only edits do not
-require another full data build.
-
-### 16. Commit, push and create a reviewable PR — Terminal A
-
-```bash
-git commit -m "Add validated local CityFlow dashboard"
-git push -u origin feat/dashboard
-cat > /tmp/cityflow_dashboard_pr_body.md <<'BODY'
-Adds a local Streamlit dashboard for date-filtered taxi activity and directed-route
-month comparisons from the existing DuckDB warehouse. The interface preserves
-calendar zeroes, independent duration/fare cohorts, route sample thresholds and
-undefined percentage growth from zero. Selected downloads contain aggregates.
-
-Validation: the established 19-case Python suite and eight-model/33-test dbt fixture
-pipeline pass; 13 additional dashboard checks exercise queries and Streamlit controls.
-The full retained snapshot passes known monthly answers, date-range reconciliation
-and declared independent route samples. Browser results and environment versions are
-recorded in docs/dashboard_results. Full Snowflake parity evidence remains separate.
-
-Snowflake test resources remain removed. Cloud connection and public hosting are next.
-BODY
-gh pr create --draft --base main --head feat/dashboard \
-  --title "Add validated local CityFlow dashboard" \
-  --body-file /tmp/cityflow_dashboard_pr_body.md
-gh pr checks --watch
-gh pr view --web
-```
-
-Use the PR description only if those validations actually passed. Inspect both the
-existing CI and **Dashboard checks** results. Review changed files in GitHub.
-If a check fails, inspect its log and fix the issue before marking the PR ready.
-
-After review and green checks, the merge commands are:
-
-```bash
-gh pr ready
-gh pr merge --squash --delete-branch
-git switch main
+git checkout main
 git pull --ff-only
-git status --short
-```
-
-Expected final worktree status: no pending changes. Retain the small validation
-evidence, local warehouse and source data. Proceed to the separate cloud
-connection/hosting phase only after this local dashboard is accepted.
+git checkout -b feat/dashboard-update
+~~~
 
 ## Stop for the night and resume tomorrow
 
@@ -534,7 +350,6 @@ Stop the app with Ctrl+C in its terminal. No Snowflake action is needed. Keep th
 Git branch and local data. For a normal next-day real-data start:
 
 ```bash
-cd ~/Desktop/projects/cityflow
 export CITYFLOW_DASHBOARD_DATABASE="$PWD/data/warehouse/cityflow.duckdb"
 export CITYFLOW_DASHBOARD_DATASET='real'
 .venv-dashboard/bin/python -m streamlit run dashboard/app.py \
