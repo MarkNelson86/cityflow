@@ -1,0 +1,6 @@
+streamlit==1.50.0
+pandas==2.2.3
+numpy==2.2.6
+pyarrow==20.0.0
+plotly==6.3.0
+snowflake-connector-python==3.18.1

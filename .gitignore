@@ -26,3 +26,8 @@ dbt_snowflake/dbt_packages/
 # Local dashboard environment and runtime files
 .venv-dashboard/
 .streamlit/secrets.toml
+
+# Private hosting credentials and generated reports
+*.p8
+*.pem
+*.key
