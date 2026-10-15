@@ -152,11 +152,21 @@ Run from the repository root after installing the dashboard environment:
 
 Open http://127.0.0.1:8501. Stop the server with Ctrl+C in its terminal.
 
+## Public dashboard
+
+[Open CityFlow](https://cityflow-mark.streamlit.app)
+
+The public app serves a validated Snowflake aggregate snapshot for January–March
+2025, with whole-month activity and selected directed routes. A dedicated key-pair
+service identity was tested from the hosted app before switching to credential-free
+snapshot mode and removing the dedicated Snowflake resources. The full local
+dashboard retains arbitrary date filters and the complete route catalog.
+
+See [deployment design](docs/hosting_design.md),
+[deployment results](docs/hosting_results/summary.md), and
+[deployment guide](docs/hosting_guide.md).
+
 ## Next milestones
 
-1. Cloud connection and hosting: connect the validated dashboard to the accepted
-   cloud environment and deploy it with tested configuration, refresh and cost behavior.
-
 See [the remaining roadmap](docs/remaining_roadmap.md). Local dashboard validation
-and Snowflake parity are complete. The dedicated Snowflake resources were removed
-after validation; cloud infrastructure will be rebuilt when needed for hosting.
+and Snowflake parity are complete. Cloud hosting of the dashboard is complete.

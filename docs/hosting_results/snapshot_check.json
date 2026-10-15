@@ -1,0 +1,18 @@
+{
+  "checked_at_utc": "2026-10-15T03:06:55.676661+00:00",
+  "all_equal": true,
+  "scope": "Every published cell across four bounded serving tables; not a new full-mart parity check.",
+  "counts": {
+    "dataset": "real",
+    "observed_records": 11198001,
+    "daily_rows": 90,
+    "monthly_rows": 3,
+    "published_routes": 105,
+    "published_route_month_rows": 315,
+    "minimum_metric_records": 30
+  },
+  "query_ids": [],
+  "raw_access_denied": null,
+  "snapshot_sha256": "e9d2e136b0653f9805fe503e1b32869d227e3268545ea72b0916f4c453713952",
+  "snapshot_bytes": 331155
+}
