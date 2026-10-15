@@ -5,7 +5,8 @@ cityflow:
       type: snowflake
       account: "{{ env_var('CITYFLOW_SF_ACCOUNT') }}"
       user: "{{ env_var('CITYFLOW_SF_USER') }}"
-      authenticator: externalbrowser
+      authenticator: snowflake
+      password: "{{ env_var('CITYFLOW_SF_PASSWORD') }}"
       role: CITYFLOW_ROLE
       database: "{{ env_var('CITYFLOW_SF_DATABASE') }}"
       warehouse: CITYFLOW_WH
