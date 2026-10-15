@@ -7,7 +7,7 @@ branch/PR with concrete validation, and reuse the existing definitions and evide
 | --- | --- | --- | --- |
 | Portfolio presentation | 3–5 hours | Reproducible activity figure, clearer README, architecture/metric documentation | Real inputs reconcile; image/links reviewed; CI green; PR merged |
 | Bounded Snowflake extension | 6–10 hours | Isolated cloud environment, staged inputs, warehouse-compatible dbt transforms, reconciliation and cleanup evidence | Fixture parity first, real-snapshot parity, recorded configuration/query evidence and suspended/cleaned resources | complete; CI green; PR merged |
-| Local interactive dashboard | 6–10 hours | Date/month and directed-route exploration, activity/metric charts, cohort-aware comparisons | Filtered outputs reconcile with validated aggregates; zero/missing/under-threshold states are correctly displayed |
+| Local interactive dashboard | 6–10 hours | Date/month and directed-route exploration, activity/metric charts, cohort-aware comparisons | Filtered outputs reconcile with validated aggregates; zero/missing/under-threshold states are correctly displayed | complete; CI green; PR merged |
 | Cloud connection and hosting | Additional 4–8 hours | Dashboard connected to the accepted cloud environment and deployed on an agreed host | Access/configuration, secrets handling, refresh and cost behavior tested |
 
 ## Portfolio phase
@@ -21,7 +21,7 @@ Keep completed local functionality distinct from the upcoming cloud and dashboar
 milestones. The static README figure will later become the dashboard's activity
 view; the same exports and definitions will support both.
 
-## Snowflake phase
+## Snowflake phase - complete
 
 Start with the generated analytical fixture in an isolated environment. Configure
 authentication, a small warehouse, access roles, staging and suspension/budget
@@ -42,22 +42,16 @@ without treating them as a direct cross-machine DuckDB performance comparison.
 Keep the local pipeline runnable, record credentials only through the chosen
 secret mechanism and finish with suspended/cleaned resources.
 
-## Dashboard phase
+## Dashboard phase - complete
 
-Build a focused analytical interface around two tasks: inspect activity across
-time and compare a chosen directed route across adjacent months. Begin with the
-validated local outputs; connect the accepted Snowflake environment once parity
-is established. Choose the dashboard/hosting tooling in that phase's guide.
+The local dashboard provides date-filtered activity and directed-route monthly
+exploration from the retained DuckDB snapshot. Fixture controls and metric boundaries
+are tested; real activity and sampled route outputs reconcile with validated aggregates.
+See [dashboard results](dashboard_results/summary.md) and
+[dashboard design](dashboard_design.md).
 
-Show eligible sample sizes beside duration/fare metrics. Preserve zero versus
-missing data, unknown/outside-city treatment, the sample threshold and undefined
-growth from zero. Clearly label a synthetic/demo dataset if it is displayed.
-Use the full route aggregates for selection, not only the top-ten highlight table.
+## Cloud connection and hosting — next
 
-Public hosting is a separate completion gate: the application must remain usable
-without exposing development credentials or accidentally running an always-active
-warehouse. The host and budget will be chosen using then-current conditions.
-
-Incremental dbt models, broader history, inference/forecasting, maps and additional
-cloud platforms remain possible later extensions. Add them when a concrete
-question or measured workload warrants the additional complexity.
+Rebuild the dedicated cloud environment when needed, add a cloud data adapter,
+and deploy the validated dashboard. Test access, secret handling, refresh behavior,
+availability and warehouse costs before calling the hosted product complete.

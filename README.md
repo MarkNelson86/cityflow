@@ -136,10 +136,27 @@ The plot uses committed daily/monthly exports, validates their counts/calendar
 and writes PNG, SVG and figure metadata. See [figure definitions](docs/figure_design.md)
 for the rolling-window rule, input hashes and recorded plotting environment.
 
+## Local dashboard
+
+The local Streamlit dashboard supports pickup-date activity exploration and directed-route
+month comparisons using the validated DuckDB snapshot. It preserves eligible cohorts,
+zero-trip months, sample thresholds and undefined growth from zero. See the
+[dashboard guide](docs/dashboard_guide.md), [design](docs/dashboard_design.md), and
+[validation results](docs/dashboard_results/summary.md).
+
+Run from the repository root after installing the dashboard environment:
+
+```bash
+.venv-dashboard/bin/python -m streamlit run dashboard/app.py
+```
+
+Open http://127.0.0.1:8501. Stop the server with Ctrl+C in its terminal.
+
 ## Next milestones
 
-1. Interactive dashboard: build local activity and directed-route exploration.
-2. Cloud connection and hosting: connect and deploy the dashboard after the local version is validated.
+1. Cloud connection and hosting: connect the validated dashboard to the accepted
+   cloud environment and deploy it with tested configuration, refresh and cost behavior.
 
-See [the remaining roadmap](docs/remaining_roadmap.md). 
-Snowflake validation is complete; the interactive dashboard is next, followed by cloud connection and hosting.
+See [the remaining roadmap](docs/remaining_roadmap.md). Local dashboard validation
+and Snowflake parity are complete. The dedicated Snowflake resources were removed
+after validation; cloud infrastructure will be rebuilt when needed for hosting.
