@@ -22,3 +22,7 @@ logs/
 dbt_snowflake/target/
 dbt_snowflake/logs/
 dbt_snowflake/dbt_packages/
+
+# Local dashboard environment and runtime files
+.venv-dashboard/
+.streamlit/secrets.toml

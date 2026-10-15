@@ -1,0 +1,40 @@
+{
+  "dataset": "real",
+  "checked_at_utc": "2026-10-14T23:52:12.486720+00:00",
+  "environment": {
+    "python": "3.11.4",
+    "duckdb": "1.5.6",
+    "streamlit": "1.50.0",
+    "pandas": "2.2.3",
+    "plotly": "6.3.0"
+  },
+  "all_checks_passed": true,
+  "counts": {
+    "raw_records": 11198026,
+    "observed_records": 11198001,
+    "daily_rows": 90,
+    "route_rows": 133377,
+    "comparison_rows": 133377,
+    "minimum_metric_records": 30
+  },
+  "monthly_observed_counts": [
+    3475234,
+    3577542,
+    4145225
+  ],
+  "partial_window": {
+    "start": "2025-01-15",
+    "end": "2025-02-14",
+    "calendar_days": 31,
+    "observed_records": 3876403
+  },
+  "sampled_route_keys": [
+    "237->236",
+    "236->237",
+    "236->236",
+    "1->1"
+  ],
+  "route_checks_scope": "Three highest-volume geographic routes (or all if fewer), plus one non-geographic route when present; not a full new parity scan.",
+  "elapsed_seconds": 5.445,
+  "read_only": true
+}
