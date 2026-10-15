@@ -45,7 +45,7 @@ The monthly observed-trip counts sum to 11,198,001.
 
 ## Selected query evidence
 
-Elapsed time and bytes scanned are from the project-tagged Snowsight query-history export. Query Profile spill observations remain to be recorded.
+Elapsed time and bytes scanned are from the project-tagged Snowsight query-history export. Query Profile spill observations are recorded below.
 
 | Operation | Query ID | Elapsed (ms) | Bytes scanned | Rows returned/produced |
 | --- | --- | ---: | ---: | ---: |
@@ -59,7 +59,7 @@ Elapsed time and bytes scanned are from the project-tagged Snowsight query-histo
   - COPY load (`01c7bb34-0308-fe97-0011-d6c20001a0ea`): 529.65 MB spilled to local storage.
   - `fact_trips` model (`01c7bb39-0308-fe97-0011-d6c20001a496`): spill metrics not reported in Query Profile.
   - `mart_route_monthly` model (`01c7bb39-0308-fe66-0011-d6c20001b46a`): 377.21 MB spilled to local storage.
-- Query-history export: `reports/snowflake/query_history.csv`
+- Query-history export: [committed query history](query_history.csv)
 
 ## Usage and cost evidence
 

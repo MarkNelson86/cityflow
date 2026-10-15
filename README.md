@@ -38,7 +38,7 @@ for thresholds, grains and interpretation limits.
 | Versioned ingestion | SHA-256 source tracking, unchanged-file skips, explicit partition replacement and transactional reconciliation |
 | Dimensional modeling | Source-preserving fact records, two directed zone joins, unique zone IDs and a complete date dimension |
 | Analytical SQL | Conditional cohorts, medians/p90, route/month grids, dense ranks, LAG and guarded percentage changes |
-| Validation | 15 pytest cases; 33 dbt data tests; synthetic boundary/zero/rank/coverage checks; real snapshot reconciliation |
+| Validation | 19 pytest cases; 33 dbt data tests; synthetic boundary/zero/rank/coverage checks; real snapshot reconciliation |
 | Performance reasoning | Equivalent fact/mart count results, repeated warm reads, captured plans and separate build-cost evidence |
 | Continuous integration | GitHub Actions runs the fixture pipeline and retains logs, dbt artifacts and a labeled results report |
 
@@ -81,7 +81,7 @@ python -m pip check
 python scripts/run_ci_checks.py
 ```
 
-This uses generated fixture inputs and an isolated local database. Expected: 15
+This uses generated fixture inputs and an isolated local database. Expected: 19
 pytest cases, eight models/33 dbt tests, and synthetic pickup-month counts **5/3/4**.
 The labeled fixture report is under `reports/ci/exports/overview.md`.
 For a repeat, use `--output-dir reports/ci-repeat` to preserve prior evidence.

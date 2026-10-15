@@ -1,4 +1,4 @@
-"""Explicit fixture tests; no network or cloud credentials required."""
+"""Fixture and committed-snapshot tests; no network or cloud credentials required."""
 import copy
 import json
 import os
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 from streamlit.testing.v1 import AppTest
-from cloud_dashboard.backend import frames, make_payload, read_snapshot, validate
+from cloud_dashboard.backend import frames, make_payload, read_snapshot, snapshot_digest, validate
 from scripts.publish_dashboard import compare, local_data
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -97,3 +97,13 @@ def test_missing_snapshot_has_safe_error(tmp_path, monkeypatch):
     app = AppTest.from_file(str(ROOT / 'cloud_dashboard/app.py')).run(timeout=30)
     assert not app.exception
     assert 'unavailable' in app.error[0].value
+
+
+def test_committed_public_snapshot_matches_deployment_report():
+    snapshot = ROOT / 'cloud_dashboard/public_snapshot.json'
+    report = json.loads((ROOT / 'docs/hosting_results/published_parity.json').read_text())
+    counts = validate(read_snapshot(snapshot))
+    assert counts['dataset'] == 'real'
+    assert counts == report['counts']
+    assert snapshot_digest(snapshot) == report['snapshot_sha256']
+    assert snapshot.stat().st_size == report['snapshot_bytes']

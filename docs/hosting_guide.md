@@ -151,7 +151,8 @@ export CITYFLOW_DASHBOARD_FIXTURE_DB="$PWD/reports/ci-hosting-fixture/work/pipel
 .venv-dashboard/bin/python -m pytest cloud_dashboard/checks.py -q --junitxml=reports/hosting/pytest.xml
 ~~~
 
-Expected: eight hosting checks pass. No Snowflake connection occurs in these tests.
+Expected: nine checks pass: eight fixture checks and one check of the committed
+public snapshot against its deployment report. No Snowflake connection occurs.
 
 ### 5. Check that the shared Streamlit config is host-compatible — Terminal A
 
@@ -488,7 +489,7 @@ cat > reports/hosting/implementation_pr.md <<'EOF'
 - Preserve the full local dashboard and add deployment/pause/cleanup instructions.
 
 ## Validation
-- Existing local CI and eight hosting fixture checks passed.
+- Existing local CI, eight hosting fixture checks, and the committed-snapshot check passed.
 - Rebuilt Snowflake real marts passed dbt and complete DuckDB parity.
 - Every published cell and serialized roundtrip matched local analytics.
 - Service-user raw access was denied; local live and snapshot modes were reviewed.
